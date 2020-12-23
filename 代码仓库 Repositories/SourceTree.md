@@ -2,7 +2,7 @@
 
 *summary*
 
-<img src="SourceTree.assets\image-20201223130936952.png" alt="image-20201223130936952" style="zoom:10%;" />
+<img src="SourceTree.assets/image-20201223130936952.png" alt="image-20201223130936952" style="zoom:10%;" />
 
 **SourceTree**是一个统一管理代码仓库的可视化Git工具。由ATLASSIAN出品。
 
@@ -35,7 +35,7 @@
 
 - 现在要将公钥上传到需要认证的GitHub账户。
 
-  ![image-20201223143054655](SourceTree.assets\image-20201223143054655.png)
+  <img src="SourceTree.assets\image-20201223143054655.png" alt="image-20201223143054655" style="zoom:80%;" />
 
   - 登录[GitHub](https://github.com/settings/keys)，**Settings > SSH and GPG Keys > New SSH key**
   - 将刚刚的多行文本粘贴进去并保存
@@ -45,4 +45,6 @@
   - 只需将远端地址从`http://...`的形式改为`git@github.com....`的形式即可，具体可在`Git Clone`处选择合适的URL
 
     <img src="SourceTree.assets\image-20201223143642613.png" alt="image-20201223143642613" style="zoom: 80%;" />
+
+
 
