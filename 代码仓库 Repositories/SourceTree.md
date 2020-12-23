@@ -2,7 +2,7 @@
 
 *summary*
 
-<img src="SourceTree.assets/image-20201223130936952.png" alt="image-20201223130936952" style="zoom:10%;" />
+<img src="SourceTree.assets/image-20201223130936952.png" alt="image-20201223130936952" style="width:300px;" />
 
 **SourceTree**是一个统一管理代码仓库的可视化Git工具。由ATLASSIAN出品。
 
@@ -44,7 +44,7 @@
 
   - 只需将远端地址从`http://...`的形式改为`git@github.com....`的形式即可，具体可在`Git Clone`处选择合适的URL
 
-    <img src="SourceTree.assets\image-20201223143642613.png" alt="image-20201223143642613" style="zoom: 80%;" />
+    <img src="SourceTree.assets\image-20201223143642613.png" alt="image-20201223143642613" style="width:300px;" />
 
 
 
