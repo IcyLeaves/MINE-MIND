@@ -2,7 +2,7 @@
 
 *summary*
 
-<img src="SourceTree.assets/image-20201223130936952.png" alt="image-20201223130936952" style="width:300px;" />
+<img src="SourceTree.assets/image-20201223130936952.png" alt="image-20201223130936952"  />
 
 **SourceTree**是一个统一管理代码仓库的可视化Git工具。由ATLASSIAN出品。
 
