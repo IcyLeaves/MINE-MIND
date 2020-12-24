@@ -14,5 +14,5 @@
 
 *2020.12.23*
 
-- [下载链接](www.baidu.com)
+- [破解版下载链接](http://www.pc6.com/softview/SoftView_59313.html)
 
