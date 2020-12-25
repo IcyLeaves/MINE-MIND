@@ -33,8 +33,8 @@
 >
 > [crontab 详细用法、定时任务 、时间规则](https://blog.csdn.net/u013967628/article/details/83504839)
 
+- 查看命令位置：`whereis ntpdate`。得到输出`/usr/bin/ntpdate`
 - 立即执行**时间同步**命令：`/usr/bin/ntpdate pool.ntp.org   `
-
 - 定时执行：
 
   - `crontab -e`进入编辑界面
