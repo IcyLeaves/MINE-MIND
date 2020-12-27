@@ -2,7 +2,7 @@
 
 *summary*
 
-<img src="..\template.assets\image-20201223131536639.png" alt="image-20201223131536639" style="zoom:22%;" />
+<img src="Linux.assets/image-20201226183218723.png" alt="image-20201226183218723" style="zoom:80%;" />
 
 **Linux**是一个常用的服务器系统
 
@@ -40,3 +40,11 @@
   - `crontab -e`进入编辑界面
 
   - 增加一行`*/5 * * * * /usr/bin/ntpdate pool.ntp.org` （每5分钟执行一次）
+
+---
+
+*2020.12.26*
+
+### 查看所有被占用的端口
+
+- `netstat -tunlp`，其中`-n`可以酌情取舍

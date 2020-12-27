@@ -6,6 +6,12 @@
 
 **Mosquitto**是一款开源的MQTT message broker（消息队列遥测传输的代理）服务，由Eclipse Foundation提供。
 
+[官方网址](https://mosquitto.org/)
+
+[MQTT JavaScript文档](https://github.com/mqttjs/MQTT.js)
+
+[Paho.mqtt Python文档](https://github.com/eclipse/paho.mqtt.python)
+
 - 客户端可以自由订阅主题和发布消息
 - 轻量级跨平台消息稳定，非常适合网络情况不佳的设备使用
 
@@ -52,3 +58,132 @@
 
   这样会在`1883`端口监听http消息，在`9001`端口监听ws消息
 
+---
+
+*2020.12.27*
+
+### 订阅SYS消息
+
+> [mosquitto常见问题及其解决办法](https://blog.csdn.net/houjixin/article/details/46711547)
+>
+> [【官方文档】mosquitto SYS消息总览](https://mosquitto.org/man/mosquitto-8.html)
+
+mosquitto可以发布一些关于自身状态的系统topic消息，启用及使用的步骤如下：
+
+- `mosquitto.conf`182行附近找到配置`sys_interval 10`
+
+- 客户端订阅SYS消息
+
+  ```js
+  client.subscribe('$SYS/broker/subscriptions/count');
+  ```
+
+### 如何断线重连时接收离线消息
+
+> [MQTT中的mosquitto简单使用以及订阅离线消息](https://www.jianshu.com/p/da9bd6be72c2)
+
+要想在客户端重连时马上收到离线时的消息，必须要确保两点：1）自身的client_id缓存在了MQ服务器上。2）消息的服务质量为“至少一次”或“只有一次”。
+
+- **缓存客户端，持久会话**：启动客户端时设置客户端id和不清除客户端缓存，以接收离线消息
+
+  - js：
+
+    ```js
+    const options = {
+          clientId: 'mina/1',
+          clean:false
+    };
+    const client = mqtt.connect(host, options);
+    ```
+
+  - python：
+
+    ```python
+    # clean_session为False时，会在重连时收到qos>0的所有消息
+    client = mqtt_client.Client(
+        client_id="printer-A", clean_session=False,transport='websockets')
+    ```
+
+- **订阅/发布Qos>=1的消息**：在订阅或发布时可以附带服务质量（Qos）的参数设置
+
+  - js：
+
+    ```js
+    client.subscribe('mobile/111', {qos: 1});
+    client.publish('printer/aaa', "Ok", {qos: 1})
+    ```
+
+  - python：
+
+    ```python
+    client.subscribe("printer/aaa", qos=1)
+    client.publish("mobile/111", "Ok", qos=1)
+    ```
+
+注意clean_session=false时可以主动接收flag参数，如果为true，说明此次连接为重连，会获取存储的缓存信息（**包括**之前的订阅主题，但由于默认重新订阅会不断覆盖，所以不会出现重复订阅导致消息重复的问题）。
+
+### 奇怪！每隔120s就重连一次！Socket error on...错误
+
+> [Nginx代理webSocket经常中断的解决方法（也就是如何保持长连接）](https://blog.csdn.net/u011411069/article/details/98475433)
+
+初次使用IP连接时，并没有出现这种情况。之后对mosquitto服务配置了域名后，客户端client才出现了频繁重连的情况，那么基本可以确定是网络相关的配置出现问题。
+
+- 首先需要nginx来帮助frp作更细致的反向代理配置，这里主要是增加了ws的支持和增加了超时时间：
+
+  ```nginx
+  #PROXY-START/
+  location  ~* \.(php|jsp|cgi|asp|aspx)$
+  {
+      proxy_pass http://127.0.0.1:23456;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header REMOTE-HOST $remote_addr;
+      proxy_connect_timeout 4s;                #配置点1
+      proxy_read_timeout 120s;          #配置点2，如果没效，可以考虑这个时间配置长一点
+      proxy_send_timeout 12s;                  #配置点3
+      proxy_set_header Upgrade $http_upgrade; 
+      proxy_set_header Connection "Upgrade";
+  }
+  location /
+  {
+      proxy_pass http://127.0.0.1:23456;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header REMOTE-HOST $remote_addr;
+      
+      add_header X-Cache $upstream_cache_status;
+      
+      proxy_connect_timeout 4s;                #配置点1
+      proxy_read_timeout 120s;          #配置点2，如果没效，可以考虑这个时间配置长一点
+      proxy_send_timeout 12s;                  #配置点3
+      proxy_set_header Upgrade $http_upgrade; 
+      proxy_set_header Connection "Upgrade";
+      #Set Nginx Cache
+      
+      	add_header Cache-Control no-cache;
+      expires 12h;
+  }
+  
+  #PROXY-END/
+  ```
+
+- 然后就是mosquitto的使用过程中增加心跳包发送，规定每隔30s就发送一次心跳包
+
+  - js：
+
+    ```js
+    const options = {
+          keepalive:30
+    };
+    const client = mqtt.connect(host, options);
+    ```
+
+  - python：
+
+    ```python
+    client.connect(host=HOST,port=PORT,keepalive=30)
+    ```
+
+    
