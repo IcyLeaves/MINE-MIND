@@ -17,7 +17,7 @@
 [1,4,9]
 ```
 
-### numpy-删除单维度
+### numpy-删除shape=1的维度
 
 ``` python
 import numpy as np

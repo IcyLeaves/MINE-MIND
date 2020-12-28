@@ -8,6 +8,8 @@
 
 [官方网址](https://mosquitto.org/)
 
+[MQTT node.js文档](https://www.npmjs.com/package/mqtt#client)
+
 [MQTT JavaScript文档](https://github.com/mqttjs/MQTT.js)
 
 [Paho.mqtt Python文档](https://github.com/eclipse/paho.mqtt.python)
@@ -186,4 +188,14 @@ mosquitto可以发布一些关于自身状态的系统topic消息，启用及使
     client.connect(host=HOST,port=PORT,keepalive=30)
     ```
 
-    
+---
+
+*2020.12.28*
+
+### 客户端如何根据收到的消息来分发事件
+
+> [*Getting Started with Node.js and MQTT*](https://blog.risingstack.com/getting-started-with-nodejs-and-mqtt/)
+
+### 及时处理异常
+
+如果在处理消息时产生异常并引起程序中断，消息会继续保留直到处理完毕（存疑），就像车祸现场一直无人处理，导致后面的车辆排长队。这会导致之后的消息不断阻塞。
