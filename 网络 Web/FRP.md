@@ -54,3 +54,10 @@
 
 大功告成！现在`a.example.com`相当于`B.ip.address:23456`
 
+---
+
+*2021.1.1*
+
+### 解决启动frpc报错Unit frpc.service entered fail state.
+
+检查frps是否开启。
