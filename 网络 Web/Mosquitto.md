@@ -192,10 +192,61 @@ mosquitto可以发布一些关于自身状态的系统topic消息，启用及使
 
 *2020.12.28*
 
-### 客户端如何根据收到的消息来分发事件
+### 施工中：客户端如何根据收到的消息来分发事件
 
 > [*Getting Started with Node.js and MQTT*](https://blog.risingstack.com/getting-started-with-nodejs-and-mqtt/)
 
-### 及时处理异常
+### 施工中：及时处理异常
 
 如果在处理消息时产生异常并引起程序中断，消息会继续保留直到处理完毕（存疑），就像车祸现场一直无人处理，导致后面的车辆排长队。这会导致之后的消息不断阻塞。
+
+---
+
+*2021.1.2*
+
+### token认证
+
+> [MQTT服务器搭建--Mosquitto用户名密码配置](https://blog.csdn.net/u012377333/article/details/69397124)
+
+Mosquitto在部署到公网上之后，为了防止其他人随意的连接，可以增加用户名密码的认证配置。
+
+- 首先是开启认证功能，Mosquitto服务器的配置文件里增加以下几行（668行附近）：
+
+  ```yaml
+  allow_anonymous false # 不允许匿名
+  password_file /mosquitto/pwfile # 存放密码文件的路径
+  ```
+
+- 然后进入到mosquitto环境中，执行命令`mosquitto_passwd -c /mosquitto/pwfile your_username`，随后输入密码`your_password`。
+
+- 由于之前使用的docker方式安装，所以还要把生成的文件挂载出来，修改`docker-compose.yml`
+
+  ```yaml
+  volumes:
+      - ./data:/mosquitto/data
+      - ./log:/mosquitto/log
+      - ./config:/mosquitto/config
+      - ./pwfile:/mosquitto/pwfile
+  ```
+
+  - 记得`docker cp mosquitto:/mosquitto/pwfile .`把密码文件取出来
+
+- 最后docker-compose来重启容器即可。
+
+- 客户端就需要在连接的选项中配置账密认证。
+
+  ```js
+  const options = {
+      username:"your_username",
+      password:"your_password"
+  };
+  const client = mqtt.connect(host, options);
+  ```
+
+  ```python
+  client.username_pw_set(username="your_username",password="your_password")
+  client.connect(host=HOST, port=PORT)
+  ```
+
+  
+
