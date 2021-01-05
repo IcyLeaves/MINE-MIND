@@ -56,8 +56,11 @@
 
 ---
 
-*2021.1.1*
+*2021.01.01*
 
 ### 解决启动frpc报错Unit frpc.service entered fail state.
 
-检查frps是否开启。
+- 检查frps是否开启。
+- 检查frps的安全组是否已放行frp端口及所有穿透端口。
+- 检查frps和frpc版本是否匹配。
+

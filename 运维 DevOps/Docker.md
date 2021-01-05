@@ -8,6 +8,29 @@
 
 ---
 
+*pinned*
+
+### 下载Docker-CE
+
+> [Install Docker Engine on CentOS](https://docs.docker.com/engine/install/centos/)
+
+### 下载Docker-Compose
+
+> [官方文档](https://docs.docker.com/compose/install/)
+
+- Linux的下载方式：
+  - 下载文件：`sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose`
+  - 赋予权限：`sudo chmod +x /usr/local/bin/docker-compose`
+  - 建立软连接：`sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose `
+
+### 卸载Docker-Compose
+
+> [docker-compose的安装和卸载](https://www.cnblogs.com/codehui/p/docker-compose-install.html)
+
+- 直接删除二进制文件：`sudo rm /usr/local/bin/docker-compose`
+
+---
+
 *2020.12.24*
 
 ### Docker Compose挂载目录的限制和解决办法
@@ -35,7 +58,7 @@ services:
 
 ---
 
-*2021.1.1*
+*2021.01.01*
 
 ### Docker常用命令
 
@@ -44,3 +67,8 @@ services:
   - `-f`,`--follow`：跟踪实时日志
   - `-t`,`--timestamp`：显示时间戳
 
+---
+
+*2021.01.04*
+
+### ERROR: failed to register layer: Error processing tar file(signal: killed): 

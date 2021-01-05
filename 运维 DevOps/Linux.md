@@ -48,3 +48,22 @@
 ### 查看所有被占用的端口
 
 - `netstat -tunlp`，其中`-n`可以酌情取舍
+
+---
+
+*2021.01.04*
+
+>  [Linux查看配置文件中未被注释的有效配置行](https://www.cnblogs.com/gange111/p/9582637.html)
+
+施工中
+
+```
+external_url 'http://10.11.6.128'
+unicorn['worker_timeout'] = 90
+unicorn['worker_processes'] = 3
+unicorn['worker_memory_limit_min'] = "1024 * 1 << 20"
+unicorn['worker_memory_limit_max'] = "1280 * 1 << 20"
+ sidekiq['max_concurrency'] = 50
+ sidekiq['min_concurrency'] = nil
+```
+
