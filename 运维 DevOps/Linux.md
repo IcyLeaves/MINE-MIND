@@ -67,3 +67,32 @@ unicorn['worker_memory_limit_max'] = "1280 * 1 << 20"
  sidekiq['min_concurrency'] = nil
 ```
 
+---
+
+*2021.01.05*
+
+### SSH免密登录
+
+> [Linux安全之SSH 密钥创建及密钥登录](https://blog.csdn.net/nahancy/article/details/79059135)
+
+- 如果该台机器还未生成过ssh密钥，则`ssh-keygen -t rsa`来生成密钥在`/root/.ssh`
+
+  <img src="Linux.assets/image-20210105170138700.png" alt="image-20210105170138700" style="zoom:80%;" />
+
+- 把公钥`id_rsa.pub`拷贝到需要登录的远程服务器上。
+
+  - **方法一（推荐）：**使用`ssh-copy-id -i /root/.ssh/id_rsa.pub root@xxx.xx.xx.xx`
+    - 会要求输入远程连接密码
+    - 默认端口是22，需要更改时添加参数`-p 端口号`
+
+  - **方法二：**手动追加公钥到`authorized_keys`**末尾**（`/root/.ssh/authorized_keys`）
+
+    - 如果远程服务器还没有这个文件：
+
+      ```sh
+      touch authorized_keys
+      chmod 600 /root/.ssh/authorized_keys
+      ```
+
+- 现在照常ssh就可以免密登录啦
+  - 初次登录可能需要yes确认一下

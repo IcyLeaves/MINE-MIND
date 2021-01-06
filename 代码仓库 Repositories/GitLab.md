@@ -2,7 +2,7 @@
 
 *summary*
 
-<img src="..\template.assets\image-20201223131536639.png" alt="image-20201223131536639" style="zoom:25%;" />
+<img src="GitLab.assets/image-20210106104539631.png" alt="image-20210106104539631" style="zoom:80%;" />
 
 **GitLab**是一个代码仓库。
 
@@ -80,3 +80,25 @@ https://blog.csdn.net/jia12216/article/details/88352711
 [502](https://www.cnblogs.com/sonyy/p/13150691.html)
 
 [【Git学习】解决GitLab内存消耗大的问题](https://ouyangpeng.blog.csdn.net/article/details/84066417)
+
+---
+
+*2021.01.05*
+
+### 安装一个GitLab Runner(Docker)
+
+- 首先要启动一个GitLab Runner容器
+
+  - > [Run GitLab Runner in a container](https://docs.gitlab.com/runner/install/docker.html)
+
+    ```sh
+       docker run -d --name gitlab-runner --restart always \
+         -v /srv/gitlab-runner/config:/etc/gitlab-runner \
+         -v /var/run/docker.sock:/var/run/docker.sock \
+         gitlab/gitlab-runner:latest
+    ```
+  
+- 然后在挂载出来的config目录下创建`config.toml`，在里面写入相关配置
+
+- `docker restart gitlab-runner`重启以应用配置
+

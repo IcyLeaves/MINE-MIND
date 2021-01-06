@@ -22,6 +22,8 @@
   - 下载文件：`sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose`
   - 赋予权限：`sudo chmod +x /usr/local/bin/docker-compose`
   - 建立软连接：`sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose `
+  - 开启Docker服务：`service start docker`
+  - 设置开机自启动：`systemctl enable docker`
 
 ### 卸载Docker-Compose
 
@@ -72,3 +74,6 @@ services:
 *2021.01.04*
 
 ### ERROR: failed to register layer: Error processing tar file(signal: killed): 
+
+---
+

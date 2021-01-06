@@ -248,5 +248,31 @@ Mosquitto在部署到公网上之后，为了防止其他人随意的连接，�
   client.connect(host=HOST, port=PORT)
   ```
 
-  
+---
+
+*2021.01.05*
+
+### MQTT+nginx的必要配置
+
+> [MQTT微信小程序开发工具可以连接真机不能连接问题解决](https://www.freesion.com/article/9239220721/)
+
+Mosquitto服务器在给微信小程序真机使用时，发现真机无法连接而开发者工具却可以。经过对请求头的比对可以发现`Sec-WebSocket-Protocol`有区别（左边是真机调试，右边是开发者工具）：
+
+<img src="Mosquitto.assets/image-20210105184053103.png" alt="image-20210105184053103" style="zoom:80%;" />
+
+要解决这个问题就得手动添加Headers的这一参数，在mqtt服务器的nginx配置文件中：
+
+```nginx
+location /{
+    proxy_pass http://iot.xxxx.com:9001;
+    #代理到上面的地址去，格式：http://域名:端口号，
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "Upgrade";
+    proxy_set_header Sec-WebSocket-Protocol mqtt;
+    proxy_connect_timeout 5s; #配置点1
+    proxy_read_timeout 60000s; #配置点2，如果没效，可以考虑这个时间配置长一点
+    proxy_send_timeout 60000s; #配置点3
+}
+```
 
