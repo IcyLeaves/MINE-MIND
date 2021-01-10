@@ -85,7 +85,7 @@ https://blog.csdn.net/jia12216/article/details/88352711
 
 *2021.01.05*
 
-### 安装一个GitLab Runner(Docker)
+### 施工中：安装一个GitLab Runner(Docker)
 
 - 首先要启动一个GitLab Runner容器
 
@@ -101,4 +101,80 @@ https://blog.csdn.net/jia12216/article/details/88352711
 - 然后在挂载出来的config目录下创建`config.toml`，在里面写入相关配置
 
 - `docker restart gitlab-runner`重启以应用配置
+
+---
+
+*2020.01.08*
+
+### 配置邮件通知
+
+> [Gitlab-ce添加邮件找回密码和代码推送提醒功能](https://www.58jb.com/html/158.html)
+>
+> [SMTP settings](https://docs.gitlab.com/omnibus/settings/smtp.html)
+>
+> [如何配置客户端软件？](http://www.126.com/help/client_04.htm)
+
+- 注册一个新的邮箱账号（比如126）
+
+  - 举例：`myEmail@126.com`和它的密码`password`
+
+- 配置`gitlab.rb`后`gitlab-ctl reconfigure`
+
+  ```yaml
+  gitlab_rails['gitlab_email_from'] = 'myEmail@126.com'
+  gitlab_rails['gitlab_email_display_name'] = 'myLab'
+  gitlab_rails['smtp_enable'] = true
+  gitlab_rails['smtp_address'] = "smtp.126.com"
+  gitlab_rails['smtp_port'] = 25 
+  gitlab_rails['smtp_user_name'] = "myEmail@126.com"
+  gitlab_rails['smtp_password'] = "password"
+  gitlab_rails['smtp_domain'] = "126.com"
+  gitlab_rails['smtp_authentication'] = "login"
+  gitlab_rails['smtp_enable_starttls_auto'] = false
+  ```
+
+- 测试后发现并没有发送出邮件。
+
+- **如何调试**：运行`gitlab-rails console`来进入控制台，启动过程有点慢，耐心等待到出现以下信息即可。
+
+  ```txt
+  --------------------------------------------------------------------------------
+   GitLab:       13.4.1 (c90be62bdef) FOSS
+   GitLab Shell: 13.7.0
+   PostgreSQL:   11.9
+  --------------------------------------------------------------------------------
+  Loading production environment (Rails 6.0.3.1)
+  irb(main):
+  ```
+
+  - 这句代码可以使用上面的配置立即发送一封邮件
+
+    ```js
+    Notify.test_email('destination_email@address.com', 'Message Subject', 'Message Body').deliver_now
+    ```
+
+  - 现在就可以看到报错了：
+
+    ```log
+    Traceback (most recent call last):
+            2: from (irb):2
+            1: from (irb):2:in `rescue in irb_binding'
+    Net::SMTPAuthenticationError (550 �û���Ȩ��½)
+    ```
+
+- 使用126的SMTP服务器，并添加授权信息
+
+  - > [【selenium+Python unittest】之使用smtplib发送邮件错误：smtplib.SMTPDataError：（554）、smtplib.SMTPAuthenticationError（例：126邮箱）](https://www.cnblogs.com/Owen-ET/p/8409141.html)
+
+  - 在`myEmail@126.com`邮箱中开启SMTP服务
+
+    <img src="GitLab.assets/image-20210108141745002.png" alt="image-20210108141745002" style="zoom:80%;" />
+
+  - 用**授权码**替换掉上面的`password`，然后重新`reconfigure`
+
+    <img src="GitLab.assets/8e46933c67c3046952cb70fb02f91fad.jpg" alt="img" style="zoom:80%;" />
+
+- 最终邮件通知成功
+
+  <img src="GitLab.assets/image-20210108142538201.png" alt="image-20210108142538201" style="zoom:80%;" />
 
