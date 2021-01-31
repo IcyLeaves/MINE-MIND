@@ -64,3 +64,36 @@
 - 检查frps的安全组是否已放行frp端口及所有穿透端口。
 - 检查frps和frpc版本是否匹配。
 
+---
+
+*2021.01.31*
+
+### 单独使用FRP进行HTTPS转HTTP
+
+> [frp下反向代理实现https协议](https://www.cnblogs.com/shook/p/12790532.html)
+
+- FRP服务端编辑：`frps.ini`
+
+```ini
+vhost_https_port = 443
+```
+
+- FRP客户端申请SSL证书
+- FRP客户端编辑：`frpc.ini`
+
+```ini
+[web_https]
+type = https
+custom_domains = test.domains.cn
+
+# 以下为https新加的内容
+plugin = https2http
+plugin_local_addr = 127.0.0.1:{your_web_port}
+
+#证书相关配置
+plugin_crt_path = {your_SSL_crt_dir}/fullchain.pem
+plugin_key_path = {your_SSL_key_dir}/privkey.pem
+plugin_host_header_rewrite = 127.0.0.1 #这里可以重写请求的域名
+plugin_header_X-From-Where = frp
+```
+

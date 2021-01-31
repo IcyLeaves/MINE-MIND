@@ -276,3 +276,59 @@ location /{
 }
 ```
 
+---
+
+*2021.01.30*
+
+### 施工中：感知客户端上线下线
+
+> [Mosquitto感知客户端上下线的方法](https://blog.csdn.net/weixin_43937302/article/details/95769728)
+
+### 施工中：部署WSS
+
+> [Mosquitto SSL Configuration -MQTT TLS Security](http://www.steves-internet-guide.com/mosquitto-tls/)
+>
+> [MQTT服务-Mosquitto简单安装及TLS双向认证配置](https://www.cnblogs.com/juanjuankaikai/p/11425598.html)
+>
+> [配置HTTPS全过程](https://blog.csdn.net/csdn_bbc/article/details/81536865)
+
+1. 新建一个**CA公钥/私钥对**
+   
+- `openssl genrsa -des3 -out ca.key 2048`
+   - 需要输入4至1023位的密码保护，如`1234`
+   
+2. 新建一个**CA证书**并使用步骤1的**key**
+   
+   - `openssl req -new -x509 -days 1826 -key ca.key -out ca.crt`
+   - 可以输入一些地区信息
+   
+3. 为**Mqtt代理**新建一个**代理公钥/私钥对**，记得不要使用密码保护
+
+   - `openssl genrsa -out server.key 2048`
+
+4. 新建一个**Mqtt代理的证书**并使用步骤3生成的**key**
+
+   - `openssl req -new -out server.csr -key server.key`
+   - 输入**Common Name**的信息时需要格外留意，一般会填写Mqtt服务器的域名或IP地址。**重要的是这个信息将用于之后的配置**。填`mqtt`也无所谓。
+   - 我们不需要把这个证书发给CA认证，**因为我们就是CA**！
+
+5. 用**CA证书**认证步骤4生成的**Mqtt代理的证书**
+
+   - `openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 360`
+
+6. 将**CA证书**，**Mqtt代理的证书**，**代理公钥/私钥对**的相关文件全部放在**Mqtt服务器**上的一个文件夹中，如`/certs`
+
+   - 现在当前路径下会有几个密钥文件，其中框起来的3个文件是关键文件`ca.crt`，`server.crt`，`server.key`
+
+   <img src="Mosquitto.assets/image-20210131111330676.png" alt="image-20210131111330676" style="zoom:80%;" />
+
+   - 将它们拷贝到Mqtt服务端的一个文件夹，如`/mosquitto/ca_certs`
+
+7. 将**CA证书**拷贝到**Mqtt客户端**
+
+   - 将`ca.crt`
+
+8. 编辑Mosquitto配置文件以使用上述文件
+
+9. 修改**Mqtt客户端**的代码以使用Https/Wss连接
+
