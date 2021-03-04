@@ -77,3 +77,57 @@ services:
 
 ---
 
+*2021.03.04*
+
+### 制作一个可以运行spring-cloud的镜像
+
+> 这个问题并未完全解决，以下草稿仅供参考，很可能有杂乱/缺失/错误等情况
+
+> [A Dockerfile for Maven-based Github projects](https://blog.frankel.ch/dockerfile-maven-based-github-projects/)
+>
+> [翻译：A Dockerfile for Maven-based Github projects](https://blog.csdn.net/dlz00001/article/details/106640610)
+
+- 环境配置阶段：众所周知java项目有许多的依赖包，这些可以通过maven进行管理，因此在编译之前，首先要在纯净的容器中借助maven下载各个依赖包。
+
+  ```dockerfile
+  FROM maven:3-openjdk-8 as basement
+  ARG MY_HOME=/app
+  COPY . $MY_HOME
+  WORKDIR $MY_HOME
+  RUN mvn clean install
+  ```
+
+  > [Maven Docker镜像使用技巧](https://www.cnblogs.com/ilinuxer/p/6649029.html)
+
+  - **优化1：使用带国内镜像源加速功能的基础镜像**。
+
+    ```dockerfile
+    FROM registry.cn-hangzhou.aliyuncs.com/acs/maven as basement
+    ```
+
+  - **优化2：利用镜像分层构建的特点，单独将pom.xml作为一层，起到缓存依赖的作用**。
+
+    ```Dockerfile
+    COPY pom.xml $MY_HOME
+    RUN ["/usr/local/bin/mvn-entrypoint.sh","mvn","verify","clean","--fail-never"]
+    
+    COPY . $MY_HOME
+    
+    RUN ["/usr/local/bin/mvn-entrypoint.sh","mvn","verify"]
+    ```
+
+  - 最终效果：
+
+    ```dockerfile
+    FROM registry.cn-hangzhou.aliyuncs.com/acs/maven as basement
+    ARG MY_HOME=/app
+    WORKDIR $MY_HOME
+    COPY pom.xml $MY_HOME
+    RUN ["/usr/local/bin/mvn-entrypoint.sh","mvn","verify","clean","--fail-never"]
+    
+    COPY . $MY_HOME
+    
+    RUN ["/usr/local/bin/mvn-entrypoint.sh","mvn","verify"]
+    ```
+
+    

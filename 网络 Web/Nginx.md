@@ -18,7 +18,9 @@
   client_max_body_size 20m;
   ```
 
-### 施工中：504 Gateway Time-out
+### 504 Gateway Time-out
+
+> 这个问题并未完全解决，以下草稿仅供参考，很可能有杂乱/缺失/错误等情况
 
 ---
 

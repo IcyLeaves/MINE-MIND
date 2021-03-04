@@ -146,3 +146,13 @@
 
   <img src="Vue.assets/image-20210110145201610.png" alt="image-20210110145201610" style="zoom:80%;" />
 
+---
+
+*2021.02.01*
+
+### 上传文件动态 action
+
+> 这个问题并未完全解决，以下草稿仅供参考，很可能有杂乱/缺失/错误等情况
+
+> [Vue + Element el-upload 动态绑定 action 上传地址，上传地址更新不及时](https://blog.csdn.net/weixin_38886539/article/details/110180400)
+

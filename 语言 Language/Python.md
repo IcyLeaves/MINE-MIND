@@ -131,3 +131,20 @@ np.squeeze(arr) # (3,2)
 
 - 想要关闭后台进程时：`kill -9 进程号`
 
+---
+
+*2021.02.01*
+
+### POST json 请求
+
+> [python post json 的一个例子](https://blog.csdn.net/wuzhong8809/article/details/91491146)
+
+```python
+adata = {
+    "email":"hi"
+}
+aheaders = {'Content-Type': 'application/json'}
+
+response = requests.post(url, headers=aheaders, data=json.dumps(adata))
+```
+

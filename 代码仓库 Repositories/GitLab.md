@@ -73,7 +73,9 @@
 - 重新应用配置：`gitlab-ctl reconfigure`
 - nginx日志：`cd /var/log/gitlab/nginx`和`cat gitlab_error.log`
 
-### 施工中：[execute] fail: gitaly: runsv not running
+### [execute] fail: gitaly: runsv not running
+
+> 这个问题并未完全解决，以下草稿仅供参考，很可能有杂乱/缺失/错误等情况
 
 https://blog.csdn.net/jia12216/article/details/88352711
 
@@ -85,7 +87,7 @@ https://blog.csdn.net/jia12216/article/details/88352711
 
 *2021.01.05*
 
-### 施工中：安装一个GitLab Runner(Docker)
+### 安装一个GitLab Runner(Docker)
 
 - 首先要启动一个GitLab Runner容器
 
@@ -93,14 +95,75 @@ https://blog.csdn.net/jia12216/article/details/88352711
 
     ```sh
        docker run -d --name gitlab-runner --restart always \
-         -v /srv/gitlab-runner/config:/etc/gitlab-runner \
+         -v /{你的配置文件路径}/config:/etc/gitlab-runner \
          -v /var/run/docker.sock:/var/run/docker.sock \
          gitlab/gitlab-runner:latest
     ```
   
-- 然后在挂载出来的config目录下创建`config.toml`，在里面写入相关配置
+- **(初始化新手向推荐)**`docker exec -it gitlab-runner bash`并`gitlab-runner register`来按照向导手动输入各项配置
+  
+  - **Enter the GitLab instance URL**：你的gitlab网站，`http://gitlab.example.com`
+  - **Enter the registration token**：`http://gitlab.example.com/admin/runners`可以看到注册令牌
+  - **Enter tags for the runner**：runner适用的tags
+  - **Enter an executor**：因为这里是使用Docker安装，因此就输入`docker`
+  - **Enter the default Docker image**：runner使用的基础系统镜像，这个基础镜像的制作也是一门学问
+  
+- **(老手推荐)**在挂载出来的config目录下创建`config.toml`，在里面写入相关配置
 
 - `docker restart gitlab-runner`重启以应用配置
+
+- 后续建议添加`docker-compose.yml`
+
+  ```yaml
+  version: '3'
+  services:
+      gitlab-runner:
+          image: gitlab/gitlab-runner
+          restart: unless-stopped
+          privileged: true
+          volumes:
+            - ./config:/etc/gitlab-runner
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /bin/docker:/bin/docker
+  ```
+
+#### 问题：runner需要使用宿主机的docker
+
+> [gitlab-runner+docker自动化集成+遇到的问题汇总](https://blog.csdn.net/bpqdwo/article/details/93715719)
+>
+> [容器运行Gitlab-Runner时无法使用docker命令](https://blog.csdn.net/dario_op/article/details/98872977)
+
+跑流水线时报错：`docker: command not found`
+
+- 先使用上述`docker-compose.yml`把宿主机的关键文件挂载
+
+- 在`config.toml`中增加docker命令挂载
+
+  ```toml
+  volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/usr/bin/docker:/usr/bin/docker","其他挂载..."]
+  ```
+
+#### 问题：日志输出过多
+
+往往是由于部分命令输出过多引起的，分类情况讨论
+
+- `mvn verify`：改为`mvn -q verify`，仅输出报错（[Maven Command Line Options](https://books.sonatype.com/mvnref-book/reference/running-sect-options.html#running-sect-verbose-option)）
+
+#### 问题：docker login的用户密码
+
+> [denied: requested access to the resource is denied](https://blog.csdn.net/benben_2015/article/details/83445696)
+
+可以选择在`gitlab-ci.yml`里明文或采用变量登录仓库
+
+- 更好的方式是挂载`config.json`
+
+  - 在`config.toml`中增加docker配置文件挂载
+
+    ```toml
+    volumes = ["/root/.docker/:/root/.docker/","其他挂载..."]
+    ```
+
+  - 然后在`gitlab-runner`容器中`docker login`一次，就会生成auth认证，这样由这个runner执行的作业都无需在流水线中手动登录
 
 ---
 

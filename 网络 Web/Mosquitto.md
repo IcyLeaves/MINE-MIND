@@ -192,11 +192,15 @@ mosquitto可以发布一些关于自身状态的系统topic消息，启用及使
 
 *2020.12.28*
 
-### 施工中：客户端如何根据收到的消息来分发事件
+### 客户端如何根据收到的消息来分发事件
+
+> 这个问题并未完全解决，以下草稿仅供参考，很可能有杂乱/缺失/错误等情况
 
 > [*Getting Started with Node.js and MQTT*](https://blog.risingstack.com/getting-started-with-nodejs-and-mqtt/)
 
-### 施工中：及时处理异常
+### 及时处理异常
+
+> 这个问题并未完全解决，以下草稿仅供参考，很可能有杂乱/缺失/错误等情况
 
 如果在处理消息时产生异常并引起程序中断，消息会继续保留直到处理完毕（存疑），就像车祸现场一直无人处理，导致后面的车辆排长队。这会导致之后的消息不断阻塞。
 
@@ -280,11 +284,46 @@ location /{
 
 *2021.01.30*
 
-### 施工中：感知客户端上线下线
+### 施工感知客户端上线下线
 
 > [Mosquitto感知客户端上下线的方法](https://blog.csdn.net/weixin_43937302/article/details/95769728)
 
-### 施工中：部署WSS
+#### 客户端异常下线发送遗嘱
+
+可以为客户端配置一个遗嘱机制——在检测到客户端异常断线时，Mosquitto自动发布一个消息。
+
+```python
+# will_set(topic, payload=None, qos=0, retain=False)
+lastwill=json.dumps({
+    'client_id':CLIENT_KEY,
+    'operation':"offline"
+})
+client.will_set("status/offline",payload=lastwill, qos=1, retain=False)
+```
+
+#### 客户端上线发送消息
+
+在客户端连接成功时立即publish一条消息即可。
+
+```python
+msg=json.dumps({
+    'client_id':CLIENT_KEY,
+    'operation':"online"
+})
+client.publish(topic="status/online", payload=msg, qos=1)
+```
+
+#### 监听者订阅status话题接收消息
+
+只要用一个特殊的客户端负责监听上述的所有消息，就能实现对普通客户端的上下线感知。
+
+```python
+client.subscribe("status/#", qos=1)
+```
+
+### 部署WSS
+
+> 这个问题并未完全解决，以下草稿仅供参考，很可能有杂乱/缺失/错误等情况
 
 > [Mosquitto SSL Configuration -MQTT TLS Security](http://www.steves-internet-guide.com/mosquitto-tls/)
 >
