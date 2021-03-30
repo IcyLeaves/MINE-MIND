@@ -131,3 +131,4 @@ unicorn['worker_memory_limit_max'] = "1280 * 1 << 20"
 - 启动ssh服务：`sudo /etc/init.d/ssh start`\
 - 修改ssh配置文件以允许root登录：`sudo vi /etc/ssh/sshd_config`，将`PermitRootLogin`的值修改为`yes`
 - 保存后重启ssh服务：` service ssh restart`
+

@@ -68,6 +68,8 @@ services:
   - `--tail 100`：显示末尾100行
   - `-f`,`--follow`：跟踪实时日志
   - `-t`,`--timestamp`：显示时间戳
+- `docker rmi $(docker images -q -f dangling=true)`
+  - 删除所有`<none>`镜像
 
 ---
 
@@ -81,53 +83,116 @@ services:
 
 ### 制作一个可以运行spring-cloud的镜像
 
-> 这个问题并未完全解决，以下草稿仅供参考，很可能有杂乱/缺失/错误等情况
-
 > [A Dockerfile for Maven-based Github projects](https://blog.frankel.ch/dockerfile-maven-based-github-projects/)
 >
 > [翻译：A Dockerfile for Maven-based Github projects](https://blog.csdn.net/dlz00001/article/details/106640610)
 
-- 环境配置阶段：众所周知java项目有许多的依赖包，这些可以通过maven进行管理，因此在编译之前，首先要在纯净的容器中借助maven下载各个依赖包。
+- 环境配置阶段1：整个后端由一个**公共模块**和若干个**子模块**组成。众所周知java项目有许多的依赖包，这些可以通过maven进行管理，因此在编译之前，首先要在纯净的容器中借助maven下载公共模块的依赖包。
 
   ```dockerfile
+  # 未优化版本
   FROM maven:3-openjdk-8 as basement
   ARG MY_HOME=/app
   COPY . $MY_HOME
   WORKDIR $MY_HOME
   RUN mvn clean install
   ```
+  
+	> [Maven Docker镜像使用技巧](https://www.cnblogs.com/ilinuxer/p/6649029.html)
 
-  > [Maven Docker镜像使用技巧](https://www.cnblogs.com/ilinuxer/p/6649029.html)
+	- **优化1：使用带国内镜像源加速功能的基础镜像**。
 
-  - **优化1：使用带国内镜像源加速功能的基础镜像**。
+  ```dockerfile
+  FROM registry.cn-hangzhou.aliyuncs.com/acs/maven as basement
+  ```
 
+	- **优化2：利用镜像分层构建的特点，单独将pom.xml作为一层，起到缓存依赖的作用**。
+	```Dockerfile
+	COPY pom.xml $MY_HOME
+	RUN ["/usr/local/bin/mvn-entrypoint.sh","mvn","verify","clean","--fail-never"]
+	
+	COPY . $MY_HOME
+	
+	RUN ["/usr/local/bin/mvn-entrypoint.sh","mvn","verify"]
+	```
+	
+	- 最终效果：通过该DockerFile可以构建一个公共模块的镜像
+	  
+	```dockerfile
+	FROM registry.cn-hangzhou.aliyuncs.com/acs/maven as basement
+	ARG MY_HOME=/app
+	WORKDIR $MY_HOME
+	COPY pom.xml $MY_HOME
+	RUN ["/usr/local/bin/mvn-entrypoint.sh","mvn","verify","clean","--fail-never"]
+	
+	COPY . $MY_HOME
+	
+	RUN ["/usr/local/bin/mvn-entrypoint.sh","mvn","verify"]
+	```
+	
+- 环境配置阶段2：现在子模块可以借助公共模块的镜像继续编译子模块的代码
+
+  - `ARG`需要由外部传入
+
+  - `-P`代表使用对应的生产环境配置文件（需要自己准备）
+  
+      ```dockerfile
+      ARG IMAG_BASE_PROD
+      FROM ${IMAGE_BASE_PROD} as builder
+      ARG MODULE_NAME
+      COPY . /usr/src/app/bx-core-server/${MODULE_NAME}
+      WORKDIR /usr/src/app
+      RUN cd /usr/src/app/bx-core-server/${MODULE_NAME} \
+        && mvn clean install -P docker
+      ```
+  
+- 打包阶段：
+
+  - 使用`openjdk`运行项目
+
+      ```dockerfile
+      FROM openjdk:8u265-jre-slim as prod
+      ARG MODULE_NAME
+      ENV MODULE_NAME ${MODULE_NAME}
+      COPY --from=builder /usr/src/app/bx-core-server/${MODULE_NAME}/target/${MODULE_NAME}.jar /root/
+      RUN ln -snf /usr/share/zoneinfo/$TIME_ZONE /etc/localtime && echo $TIME_ZONE > /etc/timezone
+      CMD java  -jar -Xmx512m /root/${MODULE_NAME}.jar
+      ```
+  
+- 其他可以参考的网址：
+
+  - [Docker build时缓存maven依赖](https://blog.csdn.net/jiangnanjunxiu/article/details/104174494)
+  - [docker springboot项目镜像优化](https://www.jianshu.com/p/32456eea0488)
+  - [Caching Maven dependencies in a Docker build](https://nieldw.medium.com/caching-maven-dependencies-in-a-docker-build-dca6ca7ad612)
+
+
+---
+
+*2021.03.08*
+
+### 制作一个可以运行Vue的镜像
+
+- Vue构建过程是使用`npm`将Vue项目打包成静态html，并放到同目录的`/dist`文件夹下。因此在Docker容器中，我们需要`nodejs`环境并下载项目所需的依赖
+
+  - **优化：使用了cnpm作为国内镜像源**。`npm run [scripts]`详见`package.json`中的`scripts`，这里的打包命令实际上是运行了`vue-cli-service build`。
+
+  - 我们选择使用Nginx来展示静态页面，因此我们将打包后的文件放到Nginx的基础镜像中。这里额外将nginx的配置文件也从Vue项目里复制出来（因此事先要准备好一个配置文件）。
+  
+  - 最终效果：通过该DockerFile可以构建一个Vue项目的镜像
+  
     ```dockerfile
-    FROM registry.cn-hangzhou.aliyuncs.com/acs/maven as basement
-    ```
-
-  - **优化2：利用镜像分层构建的特点，单独将pom.xml作为一层，起到缓存依赖的作用**。
-
-    ```Dockerfile
-    COPY pom.xml $MY_HOME
-    RUN ["/usr/local/bin/mvn-entrypoint.sh","mvn","verify","clean","--fail-never"]
-    
+    FROM node:15.11.0 as builder
+    ARG MY_HOME=/usr/src/app
     COPY . $MY_HOME
-    
-    RUN ["/usr/local/bin/mvn-entrypoint.sh","mvn","verify"]
-    ```
-
-  - 最终效果：
-
-    ```dockerfile
-    FROM registry.cn-hangzhou.aliyuncs.com/acs/maven as basement
-    ARG MY_HOME=/app
     WORKDIR $MY_HOME
-    COPY pom.xml $MY_HOME
-    RUN ["/usr/local/bin/mvn-entrypoint.sh","mvn","verify","clean","--fail-never"]
-    
-    COPY . $MY_HOME
-    
-    RUN ["/usr/local/bin/mvn-entrypoint.sh","mvn","verify"]
+    RUN npm install cnpm --registry=https://registry.npm.taobao.org \
+        && cnpm install \
+      && npm run build
+        
+    FROM nginx:1.19-alpine as prod
+    COPY --from=builder $MY_HOME/dist /usr/share/nginx/html
+    COPY --from=builder $MY_HOME/nginx.conf /etc/nginx/conf.d
     ```
+  
+- 在实际前后端分离的项目中需要注意一个nginx的配置，因为Vue项目可能向后端api发送请求，因此需要将`/api`转发到后端。
 
-    

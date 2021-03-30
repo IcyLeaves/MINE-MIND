@@ -8,6 +8,58 @@
 
 ---
 
+*pinned*
+
+### 安装FRP
+
+> [CentOS7安装frp做内网穿透](https://www.cnblogs.com/networking/p/12291299.html)
+>
+> [如何安装frp 和使用frp (linux /windows)](https://blog.csdn.net/zxf1242652895/article/details/93472012)
+>
+> [systemctl添加自定义系统服务](https://www.cnblogs.com/keystone/p/13158117.html)
+
+- [官方各版本下载 - Github](https://hub.fastgit.org/fatedier/frp/releases)
+
+- `wget https://download.fastgit.org/fatedier/frp/releases/download/v0.31.2/frp_0.31.2_linux_amd64.tar.gz`
+
+- `tar -xzvf frp_0.31.2_linux_amd64.tar.gz `
+
+- `cd frp_0.31.2_linux_amd64`
+
+- 如果是作为`frpc`使用，则删除所有服务端文件`rm -rf frps*`；如果是作为`frps`使用，则删除所有客户端文件`rm -rf frpc*`
+
+- `cd ..`并`mv frp_0.31.2_linux_amd64 /usr/local/frp_0.31.2`
+
+- （以`frpc`为例）添加到`systemctl`的`service`
+
+  - `vim /usr/lib/systemd/system/frpc.service`
+
+    ```
+    [Unit]
+    Description=frpc service
+    After=network.target syslog.target
+    wants=network.target
+    
+    [Service]
+    Type=idle
+    User=nobody
+    Restart=on-failure
+    RestartSec=5s
+    ExecStart=/usr/local/frp_0.31.2/frpc -c /usr/local/frp_0.31.2/frpc.ini
+    ExecReload=/usr/local/frp_0.31.2/frpc reload -c /usr/local/frp_0.31.2/frpc.ini
+    
+    [Install]
+    WantedBy=multi-user.target
+    ```
+
+  - ` chmod 754 /usr/lib/systemd/system/frpc.service `
+
+  - 测试：`systemctl start frpc.service`
+
+  - 开机自启动：`systemctl enable frpc.service`
+
+---
+
 *2020.12.24*
 
 ### 穿透

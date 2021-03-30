@@ -27,6 +27,7 @@
   - 宝塔
   - Docker
   - Linux
+  - Jenkins
 - 知识
   - 区块链
 - 装机

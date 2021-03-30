@@ -125,6 +125,7 @@ https://blog.csdn.net/jia12216/article/details/88352711
             - ./config:/etc/gitlab-runner
             - /var/run/docker.sock:/var/run/docker.sock
             - /bin/docker:/bin/docker
+            - /root/.ssh:/root/.ssh
   ```
 
 #### 问题：runner需要使用宿主机的docker
@@ -164,6 +165,18 @@ https://blog.csdn.net/jia12216/article/details/88352711
     ```
 
   - 然后在`gitlab-runner`容器中`docker login`一次，就会生成auth认证，这样由这个runner执行的作业都无需在流水线中手动登录
+
+#### 问题：ssh需要免密认证/maven镜像源
+
+你应该已经明白了，如何将宿主机的文件搬进runner创建的容器内
+
+- 先使用上述`docker-compose.yml`把宿主机的关键文件挂载
+
+- 在`config.toml`中增加docker命令挂载
+
+  ```toml
+  volumes = ["/root/.ssh:/root/.ssh","其他挂载..."]
+  ```
 
 ---
 
@@ -240,4 +253,65 @@ https://blog.csdn.net/jia12216/article/details/88352711
 - 最终邮件通知成功
 
   <img src="GitLab.assets/image-20210108142538201.png" alt="image-20210108142538201" style="zoom:80%;" />
+
+---
+
+*2021.03.08*
+
+### 在GitLab CI中部署前后端项目
+
+这是一个史诗级的任务，一共涉及到**前端Vue仓库**，**后端公共模块仓库**，**后端子模块仓库**。具体细节不再展示，这里只说明使用到的一些技巧。
+
+#### 活用CI/CD变量
+
+> [Gitlab CI use export variable](https://stackoverflow.com/questions/65236567/gitlab-ci-use-export-variable)
+>
+> [Understand how ARG and FROM interact](https://docs.docker.com/engine/reference/builder/#understand-how-arg-and-from-interact)
+>
+> [在docker-compose中使用环境变量](https://zhuanlan.zhihu.com/p/55486428)
+
+- **gitlab-ci.yml**：在**项目设置 > CI/CD > 变量**中可以配置流水线中使用到的变量。
+
+  ![image-20210308212647214](GitLab.assets/image-20210308212647214.png)
+
+  ```yaml
+  build:
+    script:
+      - docker build -t $IMAGE_TAG_BASE_PROD .
+  ```
+
+- **docker-compose.yml**：可以使用当前流水线中`export`的环境变量，而这个环境变量又可以沿用项目CI/CD变量
+
+  ```yaml
+  deploy:
+    before_script:
+      - export IMAGE_TAG_VUE_PROD=$IMAGE_TAG_VUE_PROD
+    script:
+      - docker-compose up -d
+  ```
+
+  ```yaml
+  services:
+    vue:
+      image: ${IMAGE_TAG_VUE_PROD}
+  ```
+
+- **DockerFile**：`ARG`参数可以声明在文件首行，流水线中执行命令时给`ARG`赋值即可
+
+  ```dockerfile
+  ARG IMAGE_TAG_BASE_PROD
+  FROM ${IMAGE_TAG_BASE_PROD}
+  ```
+
+  ```yaml
+  deploy:
+    script:
+      - docker build --build-arg IMAGE_TAG_BASE_PROD=$IMAGE_TAG_BASE_PROD
+  ```
+
+
+#### 配置FRP+Nginx
+
+- FRP的作用是将`***.domain.com`解析成内网IP+端口的形式`123.***.***.***:30000`。此时这个IP地址对应生产环境，而Nginx就要开在这个端口上。
+- Nginx的作用是将**来自用户的**请求转发到前端或后端，具体的，`location /`将转发到前端，`location /api`将转发到后端。
 

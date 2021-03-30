@@ -156,3 +156,92 @@
 
 > [Vue + Element el-upload 动态绑定 action 上传地址，上传地址更新不及时](https://blog.csdn.net/weixin_38886539/article/details/110180400)
 
+---
+
+*2021.03.06*
+
+### 使用Store管理全局变量
+
+> 这个问题并未完全解决，以下草稿仅供参考，很可能有杂乱/缺失/错误等情况
+
+> [vuex管理全局变量、全局方法](https://www.jianshu.com/p/71baddb25147)
+
+---
+
+*2021.03.11*
+
+### 如何强制检查ESlint
+
+<img src="Vue.assets/image-20210311184015205.png" alt="image-20210311184015205" style="zoom:80%;" />
+
+目前的状况是，会有error报错，但在`npm run dev`后变成了warning，并不会阻止程序的运行，这会导致还是有人偷懒不修复错误。于是想要在eslint检查不通过时直接运行失败。
+
+#### 自动修复ESlint错误
+
+> [eslint 保存自动修复_vscode下的eslint自动修复配置](https://blog.csdn.net/weixin_40001634/article/details/111813151)
+
+- 在VS Code的`settings.json`中写入：
+
+  ```json
+  "editor.codeActionsOnSave": {
+  	"source.fixAll.eslint": true
+  }
+  ```
+
+#### 打开ESlint强制检查
+
+> [vue-cli中eslint编译报错](https://blog.csdn.net/weixin_44692296/article/details/108572764)
+
+- 在`vue.config.js`中写入：
+
+  ```js
+  module.exports = {
+    devServer: {
+      overlay: {
+        warnings: true,
+        error: true
+      }
+    },
+    lintOnSave: 'error'
+  }
+  ```
+
+- 可以看到编译错误被输出到了浏览器
+
+<img src="Vue.assets/image-20210311190742137.png" alt="image-20210311190742137" style="zoom:80%;" />
+
+### 覆盖element-ui的内部class样式
+
+> [vue-cli3.0深度选择器/deep/编译报错](https://segmentfault.com/q/1010000020658004#)
+>
+> [vue加scoped后无法修改样式（无法修改element UI 样式）](https://blog.csdn.net/qq_42221334/article/details/88533329)
+>
+> [浅谈vue中style的scoped属性（修改特定Element组件样式的方法）](https://www.jianshu.com/p/9caf9e7aaca4)
+
+- 需求是**能覆盖组件内部的类**同时**不能污染全局样式**
+
+- 目前看到的解决办法有2种，对应不同的样式语言
+
+- 第一种：SCSS样式，`::v-deep`和 `/deep/`都可以尝试一下
+
+  ```vue
+  <style lang="scss" scoped>
+  .el-card{
+    ::v-deep .el-card__header {
+    width: 100%;
+  }
+  </style>
+  ```
+  
+- 第二种：CSS样式，注意需要下载`vue-loader`且版本大于`12.2.0`
+
+    ```vue
+    <style scoped>
+    .el-card >>> .el-card__header {
+      width: 100%;
+    }
+    </style>
+    ```
+
+
+
