@@ -132,3 +132,29 @@ unicorn['worker_memory_limit_max'] = "1280 * 1 << 20"
 - 修改ssh配置文件以允许root登录：`sudo vi /etc/ssh/sshd_config`，将`PermitRootLogin`的值修改为`yes`
 - 保存后重启ssh服务：` service ssh restart`
 
+---
+
+*2021.04.08*
+
+### Shell语法示例
+
+#### if-else
+
+```shell
+if [ "$(curl -I -m 10 -o /dev/null -s -w %{http_code} www.baidu.com)" == "200" ]; 
+then echo "yes"; 
+else echo "no"; 
+fi
+```
+
+上面语句的功能是，测试`www.baidu.com`的请求返回码是不是200，如果是输出`yes`，否则输出`no`
+
+- `"$(your_command)"`：这种写法可以将里面的字符串作为一个命令去执行
+
+---
+
+*2021.04.10*
+
+### 解压tar.gz
+
+- 解压缩`*.tar.gz`：`tar -zxvf 文件名`

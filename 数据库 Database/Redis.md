@@ -27,3 +27,19 @@
 - 启动`redis-server.exe`
 
 - 我的电脑 右键 > 管理 > 服务 > Redis 右键 > 
+
+---
+
+*2021.04.08*
+
+### redis常用命令
+
+在`redis-cli.exe`所在目录：
+
+- 连接到远程redis：`redis-cli -h redis.example.com -p 8080`
+
+进入redis后：
+
+- 认证：`auth YOUR_PASSWORD`
+- 查看所有的键：`keys *`
+- 删除**当前数据库**所有的键：`flushdb `

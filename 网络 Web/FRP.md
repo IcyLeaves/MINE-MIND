@@ -54,8 +54,10 @@
 
   - ` chmod 754 /usr/lib/systemd/system/frpc.service `
 
-  - 测试：`systemctl start frpc.service`
+  - 编写配置文件：`vim /usr/local/frp_0.31.2/frpc.ini`
 
+  - 测试：`systemctl start frpc.service`
+  
   - 开机自启动：`systemctl enable frpc.service`
 
 ---
@@ -97,7 +99,7 @@
     type = http
     local_ip = 127.0.0.1
     local_port = 23456 //Serv服务在内网的端口
-  custom_domains = a.example.com //和访问的域名相同
+    custom_domains = a.example.com //和访问的域名相同
     ```
 
 - 如果配置文件修改了，记得重启frp服务

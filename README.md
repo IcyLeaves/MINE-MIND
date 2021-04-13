@@ -11,6 +11,7 @@
 - 前端
   - 微信小程序
   - Vue
+  - Gauge
 - 数据库
   - MySQL
   - Redis
@@ -28,6 +29,7 @@
   - Docker
   - Linux
   - Jenkins
+  - Shell
 - 知识
   - 区块链
 - 装机
