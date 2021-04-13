@@ -14,7 +14,7 @@
 
 其他两篇相关文章为
 
-- [Gauge测试UI+Jenkins流水线+Mattermost消息订阅（Jenkins篇）](../运维%20DevOps/Jenkins.md/#gauge测试uijenkins流水线mattermost消息订阅（jenkins篇）)
+- [Gauge测试UI+Jenkins流水线+Mattermost消息订阅（Jenkins篇）](../运维%20DevOps/Jenkins.md/#gauge测试uijenkins流水线mattermost消息订阅jenkins篇)
 
-- [Gauge测试UI+Jenkins流水线+Mattermost消息订阅（Mattermost篇）](../应用%20Application/Mattermost.md/#gauge测试uijenkins流水线mattermost消息订阅（mattermost篇）)
+- [Gauge测试UI+Jenkins流水线+Mattermost消息订阅（Mattermost篇）](../应用%20Application/Mattermost.md/#gauge测试uijenkins流水线mattermost消息订阅mattermost篇)
 
