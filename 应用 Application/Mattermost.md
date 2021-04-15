@@ -23,7 +23,7 @@
   ```yaml
   app:
     ports:
-      - "14080:80"
+      - "14080:8000"
       - "14443:443"
       
   # web:
@@ -105,3 +105,44 @@ entrypoint 软连接
 - [Gauge测试UI+Jenkins流水线+Mattermost消息订阅（Jenkins篇）](../运维%20DevOps/Jenkins.md/#gauge测试uijenkins流水线mattermost消息订阅jenkins篇)
 
 > [持续交付流水线中的消息传递与协作实现](https://blog.csdn.net/weixin_40046357/article/details/106464610)
+
+#### Jenkins安装Mattermost订阅插件
+
+- 在上篇Jenkins Job获取到测试情况后，我们可以根据结果进行不同的处理
+
+  - 如果测试通过，则只是保存测试报告而不告警。30min后重新启动测试
+  - 如果测试失败，需要将“测试失败”消息和测试报告URL推送至Mattermost的频道。不会再次启动测试，需要在Mattermost使用斜杠命令重启job
+
+- Jenkins安装Mattermost插件，之后便可在pipeline中发送消息：
+
+  ![image-20210415110256778](Mattermost.assets/image-20210415110256778.png)
+
+
+#### Mattermost添加集成
+
+- 首先创建一个接收消息的频道**jenkins_hook**
+
+- **团队选项 > 集成 > 传入Webhooks** 中添加新的引入勾子：
+
+  - 用户名：jenkins
+  - 个人资料照片：`https://cdn.iconscout.com/icon/free/png-256/jenkins-5-569553.png`
+
+- 会获得一个重要的订阅链接，妥善保存，这个将在Jenkins高级篇用到
+
+  ![image-20210415122455931](Mattermost.assets/image-20210415122455931.png)
+
+- 最终效果：
+
+![image-20210415193802769](Mattermost.assets/image-20210415193802769.png)
+
+#### Mattermost配置Jenkins插件
+
+- 在**团队设置 > 插件集市**找到Jenkins并安装
+- 在配置页面填上`your_jenkins_url`，**重新生成**下面的`At Rest Encryption Key`
+- 现在可以使用斜杠命令向jenkins发送命令：
+  - 使用API_TOKEN（在Jenkins个人页中获取）连接Jenkins server：`/jenkins connect admin API_TOKEN`
+  - 启用被禁用的Job：`/jenkins enable your_jobname`
+
+- 最终效果：
+
+  ![image-20210415214657978](Mattermost.assets/image-20210415214657978.png)

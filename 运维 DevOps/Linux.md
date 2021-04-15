@@ -158,3 +158,64 @@ fi
 ### 解压tar.gz
 
 - 解压缩`*.tar.gz`：`tar -zxvf 文件名`
+
+---
+
+*2021.04.13*
+
+### 修改设备名
+
+- 设备名就是登录终端后`root@`后面的东西
+- 方法1：
+  - `vim /etc/sysconfig/network`
+  - 修改`hostname=your_name`
+  - 重启
+
+- 方法2：
+  - `vim /etc/hostname`
+  - 重启
+
+---
+
+*2021.04.14*
+
+### 更换apt-get源
+
+> [apt-get update 一直 0% working 失败解决方案](https://www.cnblogs.com/xyzluck/p/13054837.html)
+
+- 准备工作
+
+  - 如果是宿主机，请务必**备份**`source.list`
+
+- 替换镜像源
+
+  - 查看一下原来的apt源，比如
+
+    ```text
+    # deb http://snapshot.debian.org/archive/debian/20210408T000000Z stretch main
+    deb http://deb.debian.org/debian stretch main
+    # deb http://snapshot.debian.org/archive/debian-security/20210408T000000Z stretch/updates main
+    deb http://security.debian.org/debian-security stretch/updates main
+    # deb http://snapshot.debian.org/archive/debian/20210408T000000Z stretch-updates main
+    deb http://deb.debian.org/debian stretch-updates main
+    ```
+
+  - 然后去[清华大学镜像站](https://mirrors.tuna.tsinghua.edu.cn/)找到对应系统
+
+    ![image-20210414202416372](Linux.assets/image-20210414202416372.png)
+
+  - 记住`https`有可能会导致失败！酌情替换为`http`
+
+  - 一种是直接全部替换，另一种是使用强大的文本替换命令（方便在Dockerfile执行）
+
+    ```sh
+    sed -i "s@http://deb.debian.org@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list
+    sed -i "s@http://security.debian.org@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list
+    ```
+
+- 更新包
+
+  - `apt-get clean`
+  - `rm -rf /var/lib/apt/lists/*`
+  - `rm -rf /etc/apt/source.list.d/*`
+  - `apt-get update`
