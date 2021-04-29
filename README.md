@@ -24,12 +24,12 @@
 - 语言
   - 批处理
   - Python
+  - Go
 - 运维
   - 宝塔
   - Docker
   - Linux
   - Jenkins
-  - Shell
 - 知识
   - 区块链
 - 装机
