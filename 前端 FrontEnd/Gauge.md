@@ -248,7 +248,8 @@
       - docker build -t your_registry.com/gauge-taiko:master .
       - docker push your_registry.com/gauge-taiko:master
       - docker images
-```
+  ```
   
   - 可以用变量保护仓库的URL明文
+
 

@@ -117,7 +117,6 @@ services:
 	```
 	
 	- 最终效果：通过该DockerFile可以构建一个公共模块的镜像
-	  
 	```dockerfile
 	FROM registry.cn-hangzhou.aliyuncs.com/acs/maven as basement
 	ARG MY_HOME=/app
@@ -195,4 +194,75 @@ services:
     ```
   
 - 在实际前后端分离的项目中需要注意一个nginx的配置，因为Vue项目可能向后端api发送请求，因此需要将`/api`转发到后端。
+
+---
+
+*2021.04.20*
+
+### 容器时区设置
+
+> [Docker时间不一致，时区设置](https://blog.csdn.net/catoop/article/details/89737861)
+>
+> [Docker 容器时区](https://www.cnblogs.com/jhxxb/p/13305671.html)
+
+- Dockerfile形式：
+
+  ```dockerfile
+  RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone
+  ```
+
+
+---
+
+*2021.04.26*
+
+### 为容器配置代理以访问难以访问的地方
+
+> [为Docker容器设置http代理](https://www.cnblogs.com/flying607/p/10233210.html)
+>
+> [Linux系统翻墙方法 · Alvin9999/new-pac Wiki · GitHub](https://github.com/Alvin9999/new-pac/wiki/Linux系统翻墙方法)
+>
+> [Docker容器使用主机的代理网络 - 实用教程 - 高亚轩的BLOG (gaoyaxuan.net)](https://www.gaoyaxuan.net/blog/470.html)
+>
+> [docker在Ubuntu下翻墙 (juejin.cn)](https://juejin.cn/post/6844903987137740807)
+>
+> [Docker使用socks5代理_大白-CSDN博客_docker socks5代理](https://blog.csdn.net/activity110/article/details/85241450)
+
+- 首先，开放一个代理端口，比如`http://example.proxy.com`和`https://example.proxy.com`。容器需要能访问到这个代理端口，同时代理端口也要能访问容器。
+
+  - 如果是socks5的代理，底下就改写成`socks5://example.proxy.com`
+
+- 然后，设置`HTTP_PROXY`和`HTTPS_PROXY`即可。如果你希望部分域名不走代理，还需要添加`NO_PROXY`属性。
+
+  - 第一种：只希望部分容器走代理
+
+    ```dockerfile
+    ENV HTTP_PROXY "http://example.proxy.com"
+    ENV HTTPS_PROXY "https://example.proxy.com"
+    ENV NO_PROXY "*.test.example.com,127.0.0.1"
+  	```
+  
+- 第二种：希望所有容器都走代理
+  
+    - `mkdir -p /etc/systemd/system/docker.service.d`
+    
+  - `touch /etc/systemd/system/docker.service.d/http-proxy.conf`
+    
+        ```sh
+        [Service]
+        Environment="HTTP_PROXY=http://example.proxy.com" "NO_PROXY=localhost,127.0.0.1,docker-registry.somecorporation.com"
+        ```
+    
+    - `touch /etc/systemd/system/docker.service.d/https-proxy.conf`
+    
+        ```sh
+        [Service]
+        Environment="HTTPS_PROXY=https://example.proxy.com" "NO_PROXY=localhost,127.0.0.1,docker-registry.somecorporation.com"
+        ```
+    
+    - `systemctl daemon-reload`
+    
+    - `systemctl restart docker`
+    
+    - `systemctl show --property=Environment docker`验证
 

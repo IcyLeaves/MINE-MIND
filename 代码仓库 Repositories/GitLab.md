@@ -315,3 +315,74 @@ https://blog.csdn.net/jia12216/article/details/88352711
 - FRP的作用是将`***.domain.com`解析成内网IP+端口的形式`123.***.***.***:30000`。此时这个IP地址对应生产环境，而Nginx就要开在这个端口上。
 - Nginx的作用是将**来自用户的**请求转发到前端或后端，具体的，`location /`将转发到前端，`location /api`将转发到后端。
 
+---
+
+*2021.04.21*
+
+### Java使用Person Access Token调用GitLab API
+
+> [Gitlab的API调用](https://blog.csdn.net/chenxy02/article/details/78021743)
+>
+> [Personal/project access tokens](https://docs.gitlab.com/ee/api/README.html)
+>
+> [New issue](https://docs.gitlab.com/ee/api/issues.html#new-issue)
+>
+> [okhttp3.OkHttpClient Get带头部Headers，带参数请求](https://blog.csdn.net/angus_Lucky/article/details/100121875)
+
+#### 账户创建
+
+- 需要一个操作API的GitLab用户，也可以是机器人用户
+- 如果是该用户自己操作：
+  - **个人设置 > 访问令牌 > 添加个人访问令牌**，并妥善保存生成的`TOKEN`
+- 如果是管理员替该用户操作：
+  - **管理员中心 > 用户 > impersonation token**，可以给予一个模拟令牌，效果是一样的
+
+#### 请求API
+
+- 这里使用okhttp3的库实现post方法：
+
+  ```java
+  import okhttp3.*;
+  
+  public final class HttpUtil {
+      private static final MediaType CONTENT_TYPE_JSON = MediaType.parse("application/json;charset=UTF-8");
+  
+      public static String post(String url, String contentJsonStr, Map<String,String> headMap) {
+          RequestBody body = RequestBody.create(CONTENT_TYPE_JSON, contentJsonStr);
+          Headers headers = SetHeaders(headMap);//请不要传空map进来，没有判空map逻辑
+          Request request = new Request.Builder().headers(headers).url(url).post(body).build();
+          return exec(request);
+      }
+      public static Headers SetHeaders(Map<String, String> headersParams) {
+          Headers headers;
+          okhttp3.Headers.Builder headersbuilder = new okhttp3.Headers.Builder();
+          Iterator<String> iterator = headersParams.keySet().iterator();
+          String key = "";
+          while (iterator.hasNext()) {
+              key = iterator.next();
+              headersbuilder.add(key, headersParams.get(key));
+          }
+          headers = headersbuilder.build();
+          return headers;
+      }
+  }
+  ```
+
+- 这样就可以加上请求头`PRIVATE-TOKEN: xxxx`和请求实体，向GitLab API发起认证的请求了
+
+  ```java
+  void newIssue(String title)
+  {
+      Map<String,String> headers=new HashMap<>();
+      headers.put("PRIVATE-TOKEN",PRIVATE_TOKEN);
+      Map<String,Object> params=new HashMap<>();
+      params.put("id",your_id);
+      params.put("title",something_title);
+      String paramsStr=JSON.toJSONString(params);
+      HttpUtil.post("https://gitlab.example.com/api/v4/projects/:your_id/issues",
+                    paramsStr,headers);
+  }
+  ```
+
+  
+

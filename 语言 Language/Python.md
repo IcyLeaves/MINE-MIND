@@ -12,6 +12,8 @@
 
 ### Linux-Centos7系统安装教程
 
+> [miniconda安装及环境创建（Linux）](https://blog.csdn.net/weixin_44159487/article/details/105620256)
+
 - 推荐通过安装Anaconda的方式安装Python3
 
   - > [宝塔面板设置python3默认环境](https://blog.csdn.net/ztb8541/article/details/84025689)
@@ -44,7 +46,37 @@
     conda activate py37
     ```
   
-    
+  - 下载新的conda包，并查看安装位置：
+  
+    ```sh
+    conda install xxx
+    conda info
+    ```
+
+- 或者安装miniconda
+
+  - `mkdir miniconda`：新建一个miniconda文件夹
+
+  - `cd miniconda`
+
+  - `wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh`：下载软件
+
+  - `bash Miniconda3-latest-Linux-x86_64.sh`：用bash执行安装脚本
+
+  - 然后按回车键阅读协议，最后回答`yes`。安装好之后还需要一次`yes`，来执行初始化程序
+
+  - 重启终端
+
+  - 输入以下命令
+
+    ```sh
+    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+    conda config --set show_channel_urls yes 
+    conda config --set auto_activate_base false
+    ```
+
+  - 之后使用方法与Anaconda相同
 
 ---
 

@@ -68,3 +68,19 @@ server {
 }
 ```
 
+---
+
+*2021.04.25*
+
+### 验证静态文件
+
+- 把需要验证的文件`abcdefg.txt`放置在`/static`目录下
+- nginx添加配置
+
+```nginx
+location /abcdefg.txt{
+    root /static;
+}
+```
+
+- 访问`<your_server_url>/abcdefg.txt`时，就会访问文件`/static/abcdefg.txt`
