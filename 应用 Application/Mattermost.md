@@ -194,7 +194,6 @@ entrypoint 软连接
   )
   bot.run()
   ```
-```
   
 - 注意URL最后不要带斜杠
   
@@ -207,7 +206,7 @@ entrypoint 软连接
   [2021-04-19 17:52:14,497][mmpy.threadpool][INFO] Scheduler thread started.
   [04/19/2021 17:52:14][mattermostdriver.websocket][INFO] Websocket authentification OK
   [2021-04-19 17:52:14,648][mattermostdriver.websocket][INFO] Websocket authentification OK
-```
+  ```
 
 - 这里使用的是示例插件，只是监听了一些最基础的消息，比如可以去mattermost测试发送信息：`@机器人 hello_channel`
 
