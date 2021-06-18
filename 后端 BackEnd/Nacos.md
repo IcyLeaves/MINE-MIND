@@ -28,3 +28,25 @@
 set MODE="standalone"
 ```
 
+---
+
+*2021.05.10*
+
+### 屏蔽过多的输出日志
+
+> [nacos频繁打印日志_Jak的博客-CSDN博客](https://blog.csdn.net/qq_38826019/article/details/108599218)
+
+- 比较方便的做法是在对应模块的配置文件中提高日志等级
+
+  ```yaml
+  logging:
+    level:
+      com:
+        alibaba:
+          nacos:
+            client:
+              naming: error
+  ```
+
+  
+

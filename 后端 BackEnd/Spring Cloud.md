@@ -138,5 +138,28 @@ String jsonString = jsonObject.toJSONString();
   }
   ```
 
-  
+
+---
+
+*2021.05.10*
+
+### 接受FormData的数据（多个文件）
+
+> [前端vue ElementUI upload 上传文件，后端 Spring Boot MultipartFile接收文件存储_Another-CSDN博客](https://blog.csdn.net/qq_40522155/article/details/104887869)
+>
+> [Spring Boot + Vue 前后端分离，两种文件上传方式总结 - 江南一点雨 - 博客园 (cnblogs.com)](https://www.cnblogs.com/lenve/p/10782774.html)
+>
+> [JAVA项目同时上传多个文件和多个内容_凌大大的博客-CSDN博客_java多文件上传](https://blog.csdn.net/wohaqiyi/article/details/79179600)
+>
+> [spring boot 的request.getServletContext().getRealPath路径获取问题_Kenneth-peng-CSDN博客](https://blog.csdn.net/yongjiutongmi53151/article/details/87966767)
+>
+> [FormData上传文件 - 简书 (jianshu.com)](https://www.jianshu.com/p/51188659d778)
+>
+> [JSON_parseObject_InputStream_cn · alibaba/fastjson Wiki (github.com)](https://github.com/alibaba/fastjson/wiki/json_parseobject_inputstream_cn)
+>
+> [springboot项目获取resources路径（相对路径）_maybe-not的博客-CSDN博客](https://blog.csdn.net/qq_29669265/article/details/89678077)
+>
+> [Java Response实现文件下载_田野上的风筝-CSDN博客_response下载文件](https://blog.csdn.net/weixin_43100896/article/details/89880596)
+
+
 

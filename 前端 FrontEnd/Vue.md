@@ -243,5 +243,15 @@
     </style>
     ```
 
+---
 
+*2021.05.27*
+
+### 使用vue-cli初始化项目
+
+> [vue init webpack-simple与vue init webpack的区别_前端挖掘机-CSDN博客](https://blog.csdn.net/weixin_41849462/article/details/89361822)
+
+- `npm install -g vue-cli`
+- `vue init webpack your_project_name`
+  - 这里`webpack`（适合中大型项目）也可以是`webpack-simple`（适合小型项目）
 

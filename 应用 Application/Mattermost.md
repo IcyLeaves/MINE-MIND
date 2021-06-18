@@ -503,7 +503,44 @@ entrypoint 软连接
 
 - `dist/com.mattermost.google-calendar-0.2.0.tar.gz`就生成了
 
+---
 
+*2021.04.29*
 
+### 安装订阅插件
 
+> [wbernest/mattermost-plugin-rssfeed: Mattermost RSSFeed plugin. Allows users to subscribe to an rss feed and allow for updates to the feed to be posted in a channel. (github.com)](https://github.com/wbernest/mattermost-plugin-rssfeed)
+>
+> [does dev.to have rss feed? - DEV Community](https://dev.to/pachijun/comment/l882)
+>
+> [Is there a way to aggregate dev.to RSS feeds? - DEV Community](https://dev.to/alexkhismatulin/is-there-a-way-to-aggregate-dev-to-rss-feeds-4lan)
+>
+> [Hacker News RSS (hnrss.github.io)](https://hnrss.github.io/)
+
+- 首先到上面的Github仓库下载最新版release
+- 然后上传插件文件到Mattermost即可
+
+- 启用集成机器人的头像和用户名：
+  - **系统控制台 > 集成 > 集成管理**，启用**允许整合覆盖用户名**，**允许整合覆盖头像**
+  - 不然会使用`webhook`和**集成的创建者头像**作为默认用户名和头像
+
+- 插件配置里可以设定轮询rss时间（默认15分钟），消息的格式等
+- 要使用该插件，需要到你希望推送消息的频道中，然后输入斜杠命令
+- `/feed subscribe <url>`：订阅一个新的url
+- `/feed unsubscribe <url>`：取消订阅url
+- `/feed list`：列出当前已订阅的url
+
+- 这里列出几个示例rss：
+  - dev.to：`dev.to/feed/tag/opensource`
+  - hacker news 的 show 频道：`https://hnrss.org/show`
+
+### 安装禁言插件
+
+> [Brightscout/mattermost-plugin-disable-dm: A mattermost plugin to disable direct messages and group chats. (github.com)](https://github.com/Brightscout/mattermost-plugin-disable-dm)
+
+- 首先到上面的Github仓库下载最新版release
+- 然后上传插件文件到Mattermost即可
+- 禁言效果是私信和私聊群的消息会受到阻挡，并显示一条提示消息。（虽然下图能看到自己的消息，但实际上其他人是看不到的）
+
+![image-20210429145929672](Mattermost.assets/image-20210429145929672.png)
 

@@ -13,8 +13,28 @@
 ### Linux安装Go编译环境
 
 - 下载Go编译器，[Download and install - The Go Programming Language (golang.org)](https://golang.org/doc/install)
-
 - 中国代理：[go切换proxy中国代理 - Awakenedy - 博客园 (cnblogs.com)](https://www.cnblogs.com/awakenedy/articles/12813936.html)
+
+### Linux上VS Code配置Go语言插件
+
+> [Go项目的目录结构 - 迪克猪 - 博客园 (cnblogs.com)](https://www.cnblogs.com/zsy/p/5262632.html)
+>
+> [vscode安装go所有插件（全网最全）_夏的博客-CSDN博客](https://blog.csdn.net/xiazhipeng1000/article/details/109584712)
+>
+> [vs code golang开发 代理设置, 告别手动下载工具包_万象博客-CSDN博客](https://blog.csdn.net/jpy1391/article/details/107165366/)
+>
+> [gometalinter-golang代码质量检查分析工具 - SegmentFault 思否](https://segmentfault.com/a/1190000013553309?utm_source=tag-newest)
+>
+> [gometalinter cannot be installed with go 1.11 module support enabled · Issue #521 · alecthomas/gometalinter (github.com)](https://github.com/alecthomas/gometalinter/issues/521)
+
+- 如果在VS Code安装完Go扩展，会提示下载一些组件包，此时就会受到不可描述的阻碍
+
+![image-20210609151217408](Go.assets/image-20210609151217408.png)
+
+- 如果在Go1.13 及以上，修改代理是最方便的方法
+- 只需先在终端执行`export GO111MODULE=on`和`export GOPROXY=https://goproxy.cn`，然后再**Install All**即可
+- 另外还需要安装的是`GO111MODULE=off go get -u -v github.com/alecthomas/gometalinter`及`GO111MODULE=off gometalinter --install --force`，这个工具能扫描项目，使得vendor文件夹也有作用
+  - `gometalinter ./...`
 
 ---
 
@@ -94,4 +114,26 @@
     service privoxy enable
     service privoxy restart
     ```
+
+---
+
+*2021.06.09*
+
+### 报错module declares its path as A but was required as B
+
+> [go mod module declares its path as: gtihub.com/xxx-xx but was required as:xx-xx_liuqun of program life-CSDN博客](https://blog.csdn.net/liuqun0319/article/details/104054313)	
+
+- 报错格式是
+
+```
+...: ...@v1.2.3: parsing go.mod:
+        module declares its path as: A
+                but was required B
+```
+
+- 在当前go.mod中加入一行
+
+```go
+replace A => B v1.2.3 // indirect
+```
 
