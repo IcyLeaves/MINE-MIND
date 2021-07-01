@@ -70,6 +70,8 @@ services:
   - `-t`,`--timestamp`：显示时间戳
 - `docker rmi $(docker images -q -f dangling=true)`
   - 删除所有`<none>`镜像
+- `docker system prune -a`
+  - 删除所有无用的容器、镜像、网络
 
 ---
 

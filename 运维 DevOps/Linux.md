@@ -220,3 +220,76 @@ fi
   - `rm -rf /var/lib/apt/lists/*`
   - `rm -rf /etc/apt/source.list.d/*`
   - `apt-get update`
+
+---
+
+*2021.06.30*
+
+### 在远程服务器上安装图形化界面
+
+> [阿里云Ubuntu服务器图形界面配置（详细步骤，萌新看过来）_zephyr的博客-CSDN博客_阿里云ubuntu图形界面](https://blog.csdn.net/qq_43551263/article/details/88411955)
+>
+> [How to allow GUI root login on Ubuntu 20.04 Focal Fossa Linux - LinuxConfig.org](https://linuxconfig.org/how-to-allow-gui-root-login-on-ubuntu-20-04-focal-fossa-linux)
+
+以Ubuntu20.04为例
+
+- 安装
+
+  ```sh
+  apt-get update
+  apt-get upgrade
+  apt-get install ubuntu-desktop
+  reboot
+  ```
+
+- 开启GUI的root登录权限
+
+  - 确认拥有root密码，并以root用户登录终端
+
+  - `vim /etc/gdm3/custom.conf`：在daemon下添加一行`AllowRoot=true`
+
+    ```sh
+    # GDM configuration storage
+    # 
+    # See /usr/share/gdm/gdm.schemas for a list of available options.
+    
+    [daemon]
+    # Uncomment the line below to force the login screen to use Xorg
+    #WaylandEnable=false
+    
+    # Enabling automatic login
+    #  AutomaticLoginEnable = true
+    #  AutomaticLogin = user1
+    
+    # Enabling timed login
+    #  TimedLoginEnable = true
+    #  TimedLogin = user1
+    #  TimedLoginDelay = 10
+    AllowRoot=true
+    [security]
+    
+    [xdmcp]
+    
+    [chooser]
+    
+    [debug]
+    # Uncomment the line below to turn on debugging
+    # More verbose logs
+    # Additionally lets the X server dump core if it crashes
+    #Enable=true
+    ```
+
+  - `vim /etc/pam.d/gdm-password `：注释`auth  required        pam_succeed_if.so user != root quiet_success`
+
+    ```sh
+    #%PAM-1.0
+    auth    requisite       pam_nologin.so
+    # auth  required        pam_succeed_if.so user != root quiet_success
+    @include common-auth
+    auth    optional        pam_gnome_keyring.so
+    @include common-account
+    
+    ...
+    ```
+
+  - `reboot`
