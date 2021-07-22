@@ -95,6 +95,8 @@ unicorn['worker_memory_limit_max'] = "1280 * 1 << 20"
       touch authorized_keys
       chmod 600 /root/.ssh/authorized_keys
       ```
+      
+    - 追加的内容格式为`ssh-rsa 公钥内容 yourname@sample.com`
 
 - 现在照常ssh就可以免密登录啦
   

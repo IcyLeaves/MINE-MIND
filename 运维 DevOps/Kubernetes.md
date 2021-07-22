@@ -76,3 +76,39 @@ metadata:
 
 ![image-20210630155142116](Kubernetes.assets/image-20210630155142116.png)
 
+---
+
+*2021.07.11*
+
+### liveness Probe存活探针
+
+> [kubernetes就绪探针readinessProbe_chuxiong5717的博客-CSDN博客](https://blog.csdn.net/chuxiong5717/article/details/100827895)
+
+k8s可以访问服务的一个接口来判断是否可以对外提供服务，**如果发现不健康，则重启服务**
+
+- 准备一个用于返回服务就绪的接口，比如/liveness，让他能快速返回200即可
+
+  ```java
+  //提供给k8s检测
+  @GetMapping("/liveness")
+  public String readiness(){
+      return "yes";
+  }
+  ```
+
+- 在k8s的yaml配置文件里写入探针配置，之后k8s会按照配置的时间进行轮询，这里的意思是，启动部署20s后，每隔10s就再次访问一次。 **注意：务必放行接口**
+
+  ```yaml
+  spec:
+    containers:
+      livenessProbe:
+        httpGet:
+          port: 80
+          path: /readiness
+        initialDelaySeconds: 20
+        periodSeconds: 10
+  ```
+  - `httpGet.host`：默认是Pod IP
+  - `initialDelaySeconds`：第一次检测延迟秒数，设置的要尽量长，保证服务完全启动
+  - `periodSeconds`：轮询检测秒数。
+

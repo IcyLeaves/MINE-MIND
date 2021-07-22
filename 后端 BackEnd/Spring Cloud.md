@@ -2,7 +2,7 @@
 
 *summary*
 
-<img src="./Spring.assets/u=4247047143,2462685194&fm=26&gp=0.jpg" alt="u=4247047143,2462685194&fm=26&gp=0" style="zoom:80%;" />
+<img src="./Spring Cloud.assets/u=4247047143,2462685194&fm=26&gp=0.jpg" alt="u=4247047143,2462685194&fm=26&gp=0" style="zoom:80%;" />
 
 **Spring Cloud**是一个示例markdown文件，帮助作者快速建立更多的知识库！
 
@@ -145,6 +145,8 @@ String jsonString = jsonObject.toJSONString();
 
 ### 接受FormData的数据（多个文件）
 
+> 这个问题并未完全解决，以下草稿仅供参考，很可能有杂乱/缺失/错误等情况
+
 > [前端vue ElementUI upload 上传文件，后端 Spring Boot MultipartFile接收文件存储_Another-CSDN博客](https://blog.csdn.net/qq_40522155/article/details/104887869)
 >
 > [Spring Boot + Vue 前后端分离，两种文件上传方式总结 - 江南一点雨 - 博客园 (cnblogs.com)](https://www.cnblogs.com/lenve/p/10782774.html)
@@ -160,6 +162,21 @@ String jsonString = jsonObject.toJSONString();
 > [springboot项目获取resources路径（相对路径）_maybe-not的博客-CSDN博客](https://blog.csdn.net/qq_29669265/article/details/89678077)
 >
 > [Java Response实现文件下载_田野上的风筝-CSDN博客_response下载文件](https://blog.csdn.net/weixin_43100896/article/details/89880596)
+
+---
+
+*2021.07.21*
+
+### 解析XML字符串
+
+```java
+import org.dom4j.*;
+
+Document document = DocumentHelper.parseText(xmlStr);
+Element root = document.getRootElement();
+
+String something=root.selectSingleNode("/first/second").
+```
 
 
 

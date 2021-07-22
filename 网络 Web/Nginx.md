@@ -84,3 +84,14 @@ location /abcdefg.txt{
 ```
 
 - 访问`<your_server_url>/abcdefg.txt`时，就会访问文件`/static/abcdefg.txt`
+
+- 还有一个更能说明原理地一个例子：
+
+  ```nginx
+  location /first/abcdefg.txt{
+      root /static;
+  }
+  ```
+
+  - 访问`<your_server_url>/first/abcdefg.txt`时，就会访问文件`/static/first/abcdefg.txt`，也就是root是将**域名部分（不含第一个斜杠后的部分）**替换为一个文件目录
+

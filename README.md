@@ -8,6 +8,11 @@
 - 后端
   - Nacos
   - Spring Cloud
+- 力扣
+  - 位运算
+  - DP
+  - Easy
+  - Math
 - 前端
   - 微信小程序
   - Vue
@@ -21,6 +26,7 @@
   - Nginx
 - 应用
   - Mattermost
+  - QT Designer
 - 语言
   - 批处理
   - Python
@@ -30,7 +36,9 @@
   - Docker
   - Linux
   - Jenkins
+  - Kubernetes
 - 知识
   - 区块链
 - 装机
   - 虚拟机
+

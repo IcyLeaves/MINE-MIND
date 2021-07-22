@@ -255,3 +255,59 @@
 - `vue init webpack your_project_name`
   - 这里`webpack`（适合中大型项目）也可以是`webpack-simple`（适合小型项目）
 
+---
+
+*2021.07.13*
+
+### 压缩Vendor.js
+
+> 这个问题并未完全解决，以下草稿仅供参考，很可能有杂乱/缺失/错误等情况
+
+> [聊聊 webpack 打包如何压缩包文件大小 - Grewer - 博客园 (cnblogs.com)](https://www.cnblogs.com/Grewer/p/9033530.html)
+>
+> [vue项目打包之后 js文件太大的问题 - 烟雨轮回 - 博客园 (cnblogs.com)](https://www.cnblogs.com/cesarchen/p/13279686.html)
+>
+> [使用vue打包，vendor文件过大，或者是app.js文件很大 - wjw_Dream - 博客园 (cnblogs.com)](https://www.cnblogs.com/wjunwei/p/9242142.html)
+>
+> [Vue-cli 项目 打包 导致vendor js文件过大怎么处理？ - 中文 - Vue Forum (vuejs.org)](https://forum.vuejs.org/t/vue-cli-vendor-js/37246/2)
+>
+> [Vue打包导致 JS 很大的问题解决【完美解决】_小道仙的后宫-CSDN博客](https://blog.csdn.net/Tomwildboar/article/details/84175537)
+>
+> [前端性能优化之Gzip_赵天铭的博客-CSDN博客](https://blog.csdn.net/guzhao593/article/details/97498490)
+>
+> [k8s ingress-nginx自定义配置文件_yanggd1987的专栏-CSDN博客_ingress 配置文件](https://blog.csdn.net/yanggd1987/article/details/108284621)
+
+#### Gzip压缩
+
+##### 第一步：Vue项目Webpack在生产环境中打包生成.gz文件
+
+- 安装`compression-webpack-plugin`
+
+```bash
+npm i -D compression-webpack-plugin
+```
+
+- 修改
+
+```javascript
+// 最好是先判断以下环境变量是否是生产环境的打包
+const CompressionWebpackPlugin = require('compression-wepback-plugin')
+if (process.env.NODE_ENV === 'production') {
+    webpackConfig.plugins.push(
+    	new CompressionWepbackPlugin({
+            fllename: '[path].gz[query]',
+            // 目标资源名称。 [file] 会被替换成原始资源。[path] 会被替换成原始资源的路径， [query] 会被替换成查询字符串。默认值是 "[path].gz[query]"。
+            algorithm: 'gzip',
+            // 算法，默认'gzip'
+            test: '\\.(js|css))$',
+            // 所有匹配该正则的资源都会被处理。默认值是全部资源。
+            // 这里只匹配了js、css文件
+            threshold: 10240,
+          	//只有大小大于该值的资源会被处理。单位是 bytes。默认值是 0。
+            minRatio: 0.8
+            // 只有压缩率小于这个值的资源才会被处理。默认值是 0.8。
+        })
+    )
+}
+```
+
