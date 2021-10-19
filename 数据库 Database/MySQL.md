@@ -113,4 +113,111 @@
     "C:\Program Files\PowerShell\7\pwsh.exe" -Command "(gc 'C:\Users\leave\Documents\Navicat\MySQL\servers\{CONNECTION}\{SCHEMA}\sql定时汇总.sql') -replace 'INSERT INTO', 'REPLACE INTO' | Set-Content -encoding utf8NoBOM 'C:\Users\leave\Documents\Navicat\MySQL\servers\{CONNECTION}\{SCHEMA}\sql定时汇总.sql'"
     ```
 
-    
+
+---
+
+*2021.10.10*
+
+### 使用mysqldump实现主数据库拉取分数据库数据
+
+> [MySQL mysqldump数据导出详解 - pursuer.chen - 博客园 (cnblogs.com)](https://www.cnblogs.com/chenmh/p/5300370.html)
+>
+> [linux直接执行sql文件的方式_林家大叔-CSDN博客](https://blog.csdn.net/u014368609/article/details/52690843)
+>
+> [【转载】linux中批量替换文本中字符串命令 - -天道酬勤- - 博客园 (cnblogs.com)](https://www.cnblogs.com/wbl001/p/12492055.html)
+
+需求：每天零点需要将分数据库的数据汇总到主数据库，数据是以更新/插入的方式汇总的，这意味着不会像常规的【删除表-创建表-导入数据】传输数据方式一样操作。
+
+Linux服务器可以定时执行脚本，所以探索mysql的终端命令就成了必要
+
+#### mysqldump及相关参数
+
+##### 默认模式
+
+先来看最基本的使用方式：按照默认方式导出。这样会完完全全使用源数据库覆盖掉目标数据库。
+
+```sh
+mysqldump --host 123.123.123.123 --port 3306 -uIcy -p123 --databases db1 --tables tb1 tb2 >/root/sqldump/default.sql
+```
+
+- --host：实例的地址
+- --port：实例的端口
+- -u：后面**紧跟**实例用户名，这里以`Icy`为例
+- -p：后面**紧跟**实例密码，这里以`123`为例
+- --databases：可以指定某个数据库
+- --tables ：可以指定若干个表
+- 注意箭头方向是朝右输出
+
+可以发现每个表都会经历：
+
+- DROP TABLE
+- CREATE TABLE
+- LOCK TABLE WRITE
+- INSERT INTO
+- UNLOCK
+
+```sql
+--
+-- Table structure for table `department_info`
+--
+
+DROP TABLE IF EXISTS `department_info`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `department_info` (
+  `department_id` char(25) NOT NULL,
+  `department_name` varchar(255) DEFAULT NULL COMMENT '部门名称',
+  `member_num` int(11) DEFAULT NULL COMMENT '用户数量',
+  `approve` varchar(25) DEFAULT NULL COMMENT '审批方式',
+  `is_deleted` int(1) DEFAULT NULL,
+  PRIMARY KEY (`department_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `department_info`
+--
+
+LOCK TABLES `department_info` WRITE;
+/*!40000 ALTER TABLE `department_info` DISABLE KEYS */;
+INSERT INTO `department_info` VALUES ('101','无所属',3,'行政审批',0),('102','水球部',1,'智能审批',0);
+/*!40000 ALTER TABLE `department_info` ENABLE KEYS */;
+UNLOCK TABLES;
+```
+
+##### 不创建数据库，不扔表，不创建表
+
+```sh
+mysqldump --no-create-db --no-create-info  ...
+```
+
+- --no-create-db：取消创建数据库sql(默认存在)
+- --no-create-info：取消创建表sql(默认存在)
+
+```mysql
+--
+-- Dumping data for table `department_info`
+--
+
+LOCK TABLES `department_info` WRITE;
+/*!40000 ALTER TABLE `department_info` DISABLE KEYS */;
+INSERT INTO `department_info` VALUES ('101','无所属',3,'行政审批',0),('102','水球部',1,'智能审批',0);
+/*!40000 ALTER TABLE `department_info` ENABLE KEYS */;
+UNLOCK TABLES;
+```
+
+#### 使用sed命令替换INSERT INTO 为 REPLACE INTO
+
+```sh
+sed -i "s/INSERT INTO/REPLACE INTO/g"  /root/sqldump/default.sql
+```
+
+#### 远程MYSQL执行本地sql文件
+
+```sh
+mysql --host 123.123.123.123 --port 3306 -uI -p123 -D kirinEA </root/sqldump/default.sql
+```
+
+- -D：指定数据库
+- 注意箭头方向是朝左输入
+

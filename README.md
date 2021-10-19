@@ -8,15 +8,22 @@
 - 后端
   - Nacos
   - Spring Cloud
+- 机器学习
+  - Pandas
 - 力扣
   - 位运算
   - DP
   - Easy
   - Math
+  - 链表
+  - 树
+  - 数组
+  - 栈
 - 前端
   - 微信小程序
   - Vue
   - Gauge
+  - NodeJs
 - 数据库
   - MySQL
   - Redis
@@ -24,13 +31,16 @@
   - FRP
   - Mosquitto
   - Nginx
+  - Trojan
 - 应用
   - Mattermost
   - QT Designer
+  - Wiki.js
 - 语言
   - 批处理
   - Python
   - Go
+  - CMake
 - 运维
   - 宝塔
   - Docker

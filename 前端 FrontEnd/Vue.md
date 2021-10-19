@@ -8,6 +8,50 @@
 
 ---
 
+*pinned*
+
+### 单页面HTML模板（包括引入Element）
+
+> [element-ui本地使用 - 534大熊猫 - 博客园 (cnblogs.com)](https://www.cnblogs.com/yph5233/p/12870251.html)
+
+```html
+<html>
+
+<head>
+  <link href="element.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+  <div id="app">
+    <el-button @click="hello()">{{hey}}</el-button>
+  </div>
+</body>
+<script language="javascript" src="vue.js"></script>
+<script language="javascript" src="element.js"></script>
+<script>
+var Default=new Vue({
+    el: '#app',
+    data: {
+        hey:"你好"
+    },
+    methods:{
+        hello(){
+            this.hey="嗨"
+        }
+    }
+})
+
+</script>
+
+</html>
+```
+
+- vue.js和element.js分别去vue和element的官网寻找
+- fonts文件（以2.13.1为例）下载地址：https://unpkg.com/browse/element-ui@2.13.1/lib/theme-chalk/fonts
+  - `.ttf`和`.woff`下载后放在单页面文件同级的`fonts`文件夹下
+
+---
+
 *2020.12.25*
 
 ### Vue的开发环境解决跨域请求问题
@@ -311,3 +355,96 @@ if (process.env.NODE_ENV === 'production') {
 }
 ```
 
+---
+
+*2021.07.31*
+
+### Linux下html的中文乱码
+
+> [Linux中文显示乱码问题解决方法(编码查看及转换） - 整合侠 - 博客园 (cnblogs.com)](https://www.cnblogs.com/lizm166/p/12598731.html)
+>
+> [linux下html文件在浏览器中的显示乱码_weixin_33885676的博客-CSDN博客](https://blog.csdn.net/weixin_33885676/article/details/92987954)
+
+- 安装中文语言支持：`yum -y groupinstall chinese-support`
+
+- 设置中文字符集：
+
+  ```sh
+  >>> /etc/profile 最后添加
+  export LANG="zh_CN.UTF-8"
+  >>> shell
+  . /etc/profile
+  ```
+
+- HTML中声明编码格式：
+
+  ```html
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  ```
+
+
+---
+
+*2021.08.01*
+
+### 让网页初步适配移动端浏览器尺寸
+
+> [如何开发手机端网页，如何让网页自适应？_hahhahahaa的博客-CSDN博客_网页手机端自适应](https://blog.csdn.net/hahhahahaa/article/details/80901871)
+>
+> [移动端Web页面适配方案（整理版） - 简书 (jianshu.com)](https://www.jianshu.com/p/2c33921d5a68)
+>
+> [viewport 深入理解 | 菜鸟教程 (runoob.com)](https://www.runoob.com/w3cnote/viewport-deep-understanding.html)
+
+- 在HTML的head中添加meta标签
+
+  ```html
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable: no,maximum-scale=1.0, minimum-scale=1.0"/>
+  ```
+
+
+---
+
+*2021.08.02*
+
+### el-select可搜索选择框在iOS上不弹出键盘
+
+> [[Bug Report\] El-select component (remote or filterable) soft keyboard does not appear on Android devices · Issue #12563 · ElemeFE/element (github.com)](https://github.com/ElemeFE/element/issues/12563)
+
+- element.js原代码：
+
+- ```js
+  readonly: function () { return !this.filterable || this.multiple || !(!h.a.prototype.$isServer && !isNaN(Number(document.documentMode))) && !(!h.a.prototype.$isServer && navigator.userAgent.indexOf("Edge") > -1) && !this.visible; }
+  ```
+
+- 替换为
+
+- ```js
+  readonly: function () { return !this.filterable || this.multiple || !(!h.a.prototype.$isServer && !isNaN(Number(document.documentMode))) && !(!h.a.prototype.$isServer && navigator.userAgent.indexOf("Edge") > -1) && !this.visible && !this.remote && !this.filterable; }
+  ```
+
+---
+
+*2021.09.12*
+
+### 为VS Code项目配置自动ESLint修复
+
+- 在项目中下载依赖`eslint`：`npm install eslint`
+
+- 在VS Code的`settings.json`中添加：
+
+  ```json
+  "eslint.alwaysShowStatus": true,
+    // 每次保存时将代码按eslint格式进行保存
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    },
+    // 添加vue支持
+  "eslint.validate": [
+      "javascript",
+      "vue",
+      "html",
+  ]
+  ```
+
+- 项目里同样要配置`.eslintrc.js`噢
+- 重启VS Code

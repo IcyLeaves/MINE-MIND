@@ -1,4 +1,4 @@
-# +Go
+# Go
 
 *summary*
 
@@ -32,7 +32,7 @@
 ![image-20210609151217408](Go.assets/image-20210609151217408.png)
 
 - 如果在Go1.13 及以上，修改代理是最方便的方法
-- 只需先在终端执行`export GO111MODULE=on`和`export GOPROXY=https://goproxy.cn`，然后再**Install All**即可
+- 只需先在终端执行`export GO111MODULE=on`和`export GOPROXY=https://goproxy.cn`，然后**重新打开窗口**再**Install All**即可
 - 另外还需要安装的是`GO111MODULE=off go get -u -v github.com/alecthomas/gometalinter`及`GO111MODULE=off gometalinter --install --force`，这个工具能扫描项目，使得vendor文件夹也有作用
   - `gometalinter ./...`
 

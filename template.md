@@ -18,3 +18,12 @@
 *history*
 
 - [下载链接](www.baidu.com)
+
+---
+
+*2021.10.02*
+
+### VS Code正则匹配规则
+
+> [正则表达式语言 - 快速参考 | Microsoft Docs](https://docs.microsoft.com/zh-cn/dotnet/standard/base-types/regular-expression-language-quick-reference)
+

@@ -178,5 +178,49 @@ Element root = document.getRootElement();
 String something=root.selectSingleNode("/first/second").
 ```
 
+---
 
+*2021.10.1*
+
+### 为Spring Cloud微服务配置JUnit5
+
+> [Springboot集成JUnit5优雅进行单元测试 - 海向 - 博客园 (cnblogs.com)](https://www.cnblogs.com/haixiang/p/13812363.html)
+>
+> [单元测试实践（SpringCloud+Junit5+Mockito+DataMocker） - 陈晨_软件五千言 - 博客园 (cnblogs.com)](https://www.cnblogs.com/pluto4596/p/11703382.html)
+
+#### 一、安装
+
+安装的步骤就过了吧
+
+#### 二、idea配置test文件夹
+
+在idea中，**File** > **Project Structure** > **Modules**，然后在你预先创建的test文件夹上右键，选择test就行了。一般可以按照这样的结构创建test：
+
+<img src="Spring Cloud.assets/image-20211001182542248.png" alt="image-20211001182542248" style="zoom:80%;" />
+
+#### 三、创建一个测试类
+
+在idea中，在某个实现类的代码里右键，**Generate..** > **Test**，就能创建一个最简单的文件
+
+#### 四、跑第一个测试
+
+这是最困难的一步，因为如果进行单元测试，往往会隔断很多中间件的联系，从而导致测试根本跑不起来。
+
+```java
+@ExtendWith(SpringExtension.class)
+@SpringBootTest
+@ActiveProfiles("dev")
+@TestPropertySource(locations = "classpath:application.yml")
+@WebAppConfiguration
+public class CourseServiceImplTest {
+    @Autowired
+    ICourseService iCourseService;
+    @Test
+    void allCourse() {
+        //示例
+        Map<String,Object> res=iCourseService.allCourse(1,10);
+        assertEquals(10,res.keySet().size());
+    }
+}
+```
 

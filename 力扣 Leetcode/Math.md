@@ -6,6 +6,8 @@
 
 ---
 
+*2021.07.18*
+
 ### 螺旋数组
 
 > [LCP 29. 乐团站位](https://leetcode-cn.com/problems/SNJvJP/)
@@ -128,5 +130,18 @@ $$
   rank=3*[n(k)-1]+down-i+1
   $$
 
-  
+---
 
+*2021.08.26*
+
+### 线段交集
+
+> [836. 矩形重叠 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/rectangle-overlap/)
+
+- 要判断`(a1,a2)`和`(b1,b2)`两段线段是否有重叠：
+
+  ```cpp
+  min(a2,b2)>max(a1,b1);
+  ```
+
+  

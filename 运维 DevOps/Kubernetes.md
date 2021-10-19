@@ -112,3 +112,23 @@ k8s可以访问服务的一个接口来判断是否可以对外提供服务，**
   - `initialDelaySeconds`：第一次检测延迟秒数，设置的要尽量长，保证服务完全启动
   - `periodSeconds`：轮询检测秒数。
 
+---
+
+*2021.08.25*
+
+### kt-connect的安装与使用
+
+> [Downloads (alibaba.github.io)](https://alibaba.github.io/kt-connect/#/en-us/downloads)
+
+- 先安装依赖sshuttle：`pip install sshuttle`
+
+- 然后安装kt-connect
+
+  ```shell
+  $ curl -OL https://github.com/alibaba/kt-connect/releases/download/v0.1.0/ktctl_0.1.0_linux_amd64.tar.gz
+  $ tar -xzvf ktctl_linux_amd64.tar.gz
+  $ mv ktctl_linux_amd64 /usr/local/bin/ktctl
+  $ ktctl -h
+  ```
+
+  

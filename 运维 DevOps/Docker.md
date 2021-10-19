@@ -72,6 +72,10 @@ services:
   - 删除所有`<none>`镜像
 - `docker system prune -a`
   - 删除所有无用的容器、镜像、网络
+- `docker stats`
+  - 查看相关信息，比较有用的是查看占用的内存
+- `docker system df`
+  - 查看占用的磁盘空间
 
 ---
 
@@ -267,4 +271,20 @@ services:
     - `systemctl restart docker`
     
     - `systemctl show --property=Environment docker`验证
+
+---
+
+*2021.10.13*
+
+### 安装Portainer
+
+> [Install Portainer with Docker on Linux - Portainer Documentation](https://docs.portainer.io/v/ce-2.9/start/install/server/docker/linux)
+
+```sh
+docker run -d -p 9000:9000 --name portainer \
+--restart=always \
+-v /var/run/docker.sock:/var/run/docker.sock \
+-v /root/portainer-:/data \
+portainer/portainer-ce:latest
+```
 
