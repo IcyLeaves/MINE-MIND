@@ -10,7 +10,9 @@
 
 *pinned*
 
-### 安装Docker版
+### ~~安装Docker版~~
+
+> !!!此社区版教程已弃用，需要遵循最新的安装教程!!!
 
 - 非官方的安装教程（不过很管用）：[Deploy Mattermost on Docker](https://docs.mattermost.com/install/prod-docker.html)
 
@@ -76,6 +78,56 @@
       && pip --no-cache-dir install -i https://mirrors.aliyun.com/pypi/simple/ -c pip-constraints.txt 'wal-e<1.0.0' envdir \
       && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
   ```
+
+### 安装Docker版
+
+> [mattermost/docker: Redesigned mattermost-docker (github.com)](https://github.com/mattermost/docker)
+
+- 这里以截至2021.10.20的6.0.1版本为例，走一下安装流程，保险起见还是参照github仓库的README。
+
+- 克隆docker项目
+
+  ```sh
+  git clone https://github.com/mattermost/docker
+  cd docker
+  ```
+
+- 生成env变量配置文件
+
+  - `cp env.example .env`
+
+  - 修改以下内容：
+
+    ```
+    DOMAIN=cs4all.shuishan.net.cn
+    TZ=Asia/Shanghai
+    MATTERMOST_IMAGE=mattermost-team-edition
+    MATTERMOST_IMAGE_TAG=6.0.1
+    APP_PORT=25080
+    ```
+
+  - 这里由于使用了自己的nginx，所以跳过了HTTPS和nginx的相关配置
+
+- 生成挂载目录
+
+  ```sh
+  mkdir -p ./volumes/app/mattermost/{config,data,logs,plugins,client/plugins}
+  sudo chown -R 2000:2000 ./volumes/app/mattermost
+  ```
+
+- 启动docker-compose
+
+  - `sudo docker-compose -f docker-compose.yml -f docker-compose.without-nginx.yml up -d`
+  - 如果需要开多个mm，记得手动修改container_name
+
+#### 从mattermost-docker仓库迁移升级
+
+- 如果是旧版，请无视
+
+  ```sh
+  
+  ```
+
 
 ---
 
