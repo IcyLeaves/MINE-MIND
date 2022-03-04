@@ -26,6 +26,8 @@
 > [gometalinter-golang代码质量检查分析工具 - SegmentFault 思否](https://segmentfault.com/a/1190000013553309?utm_source=tag-newest)
 >
 > [gometalinter cannot be installed with go 1.11 module support enabled · Issue #521 · alecthomas/gometalinter (github.com)](https://github.com/alecthomas/gometalinter/issues/521)
+>
+> [(3条消息) Installing github.com/uudashr/gopkgs/v2/cmd/gopkgs FAILED VS code中安装Go的插件失败_fu_gui_mu_dan的博客-CSDN博客](https://blog.csdn.net/weixin_40222848/article/details/108686932)
 
 - 如果在VS Code安装完Go扩展，会提示下载一些组件包，此时就会受到不可描述的阻碍
 
@@ -33,8 +35,15 @@
 
 - 如果在Go1.13 及以上，修改代理是最方便的方法
 - 只需先在终端执行`export GO111MODULE=on`和`export GOPROXY=https://goproxy.cn`，然后**重新打开窗口**再**Install All**即可
+  - 2022.02.08更新：更好用的方式是`go env -w GO111MODULE=on`和`go env -w GOPROXY=https://goproxy.io,direct`
 - 另外还需要安装的是`GO111MODULE=off go get -u -v github.com/alecthomas/gometalinter`及`GO111MODULE=off gometalinter --install --force`，这个工具能扫描项目，使得vendor文件夹也有作用
   - `gometalinter ./...`
+
+### Go语言教程
+
+> [k8stech/go-learning: golang 实战课程示例代码 (github.com)](https://github.com/k8stech/go-learning)
+
+
 
 ---
 
@@ -136,4 +145,14 @@
 ```go
 replace A => B v1.2.3 // indirect
 ```
+
+---
+
+*2022.02.08*
+
+### go mod tidy
+
+> [go 1.16.4： go mod tidy的用途_刘宏缔的go森林-CSDN博客_go mod tidy](https://blog.csdn.net/weixin_43881017/article/details/117359986)
+
+- 扫描依赖
 

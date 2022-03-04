@@ -391,3 +391,100 @@ spec:
   - kubelet：负责Pod对应容器的创建、停止等任务，同时要与Master节点协作
   - kube-proxy：负责Service的通信与负载均衡机制。当然这个负载均衡是针对单Node上的多Pod的软件模式的负载均衡。
 
+---
+
+*2022.02.09*
+
+### ConfigMap 配置项
+
+- 可以存储其他对象所需要使用的配置。 
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: game-demo
+data:
+  # 类属性键；每一个键都映射到一个简单的值
+  player_initial_lives: "3"
+  ui_properties_file_name: "user-interface.properties"
+
+  # 类文件键
+  game.properties: |
+    enemy.types=aliens,monsters
+    player.maximum-lives=5    
+  user-interface.properties: |
+    color.good=purple
+    color.bad=yellow
+    allow.textmode=true   
+```
+
+- 其他对象的配置中可以这么使用：
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-demo-pod
+spec:
+  containers:
+    - name: demo
+      image: alpine
+      command: ["sleep", "3600"]
+      env:
+        # 定义环境变量
+        - name: PLAYER_INITIAL_LIVES # 请注意这里和 ConfigMap 中的键名是不一样的
+          valueFrom:
+            configMapKeyRef:
+              name: game-demo           # 这个值来自 ConfigMap
+              key: player_initial_lives # 需要取值的键
+        - name: UI_PROPERTIES_FILE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: game-demo
+              key: ui_properties_file_name
+      volumeMounts:
+      - name: config
+        mountPath: "/config"
+        readOnly: true
+  volumes:
+    # 你可以在 Pod 级别设置卷，然后将其挂载到 Pod 内的容器中
+    - name: config
+      configMap:
+        # 提供你想要挂载的 ConfigMap 的名字
+        name: game-demo
+        # 来自 ConfigMap 的一组键，将被创建为文件（/config/game.properties 和 /config/user-interface.properties）
+        # 里面的内容就是之前configmap里所写的那些z
+        items:
+        - key: "game.properties"
+          path: "game.properties"
+        - key: "user-interface.properties"
+          path: "user-interface.properties"
+```
+
+- > [K8S 数据卷volumes之ConfigMap_途径日暮不赏丶的博客-CSDN博客](https://blog.csdn.net/weixin_45880055/article/details/117590045)
+
+- 如果要更改容器中挂载的configmap，其实只要在k8s中修改使用的configmap就行了，对应的容器内文件都会同步更改。这个就类似于docker的挂载模式，只不过现在挂载到宿主机的位置是k8s的**ConfigMap**资源
+
+```sh
+# 查看
+kubctl get cm [-n <namespace>]
+kubectl describe cm <ConfigMap名> [-n <namespace>]
+# 查看被挂载的pod
+kubectl get pod -n <namespace>
+# 验证挂载情况
+kubectl exec -it <Pod名> -n <namespace> -- sh
+```
+
+### 快速重新部署Deployment
+
+> [重启Kubernetes Pod的几种方式 - 梦轻尘 - 博客园 (cnblogs.com)](https://www.cnblogs.com/uglyliu/p/12067315.html)
+
+- Kubernetes可没有`kubectl restart`这种类似Docker重启容器的命令，因此可能要绕着弯去实现。
+
+```sh
+# 注意，这是两个步骤，需要先后执行
+kubectl scale deployment <Deploy名> --replicas=0 -n <namespace>
+kubectl scale deployment <Deploy名> --replicas=1 -n <namespace>
+```
+
