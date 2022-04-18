@@ -488,3 +488,72 @@ kubectl scale deployment <Deploy名> --replicas=0 -n <namespace>
 kubectl scale deployment <Deploy名> --replicas=1 -n <namespace>
 ```
 
+---
+
+*2022.03.30*
+
+### 配置Kuberenetes Dashboard
+
+> 官方地址：https://github.com/kubernetes/dashboard
+>
+> [k8s 配置dashboard_哈哈虎123的博客-CSDN博客_k8s 配置dashboard](https://blog.csdn.net/u010953609/article/details/121141207)
+
+- 下载配置清单文件：`wget https://raw.githubusercontent.com/kubernetes/dashboard/v2.5.1/aio/deploy/recommended.yaml`
+
+- NodePort方便外网访问
+
+  ```yaml
+  spec:
+    type: NodePort
+    ports:
+      - port: 443
+        targetPort: 8443
+        nodePort: 30443
+    selector:
+      k8s-app: kubernetes-dashboard
+  ```
+
+  - 进阶：配置LoadBalancer取代这种方式
+
+- 应用到kubernetes：`kubectl apply -f recommended.yaml`
+
+- 打开`https://{IP:NodePort}`就可以看到初始界面
+
+  ![image-20220330151313088](Kubernetes.assets/image-20220330151313088.png)
+
+#### 获取token
+
+- 创建一个Admin User
+
+  ```yaml
+  apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: admin-user
+    namespace: kubernetes-dashboard
+  ```
+
+- 创建一个ClusterRole
+
+  ```yaml
+  apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    name: admin-user
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: cluster-admin
+  subjects:
+  - kind: ServiceAccount
+    name: admin-user
+    namespace: kubernetes-dashboard
+  ```
+
+- 获取token：`kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}"`
+
+- 输入结果：
+
+  ![image-20220330152633191](Kubernetes.assets/image-20220330152633191.png)
+
+- 

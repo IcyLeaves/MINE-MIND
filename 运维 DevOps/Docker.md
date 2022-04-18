@@ -288,3 +288,18 @@ docker run -d -p 9000:9000 --name portainer \
 portainer/portainer-ce:latest
 ```
 
+---
+
+*2022.03.24*
+
+### 制作一个可以测试前端的Docker镜像
+
+#### 寻找一个python环境的基础镜像
+
+> [Image Layer Details - python:3.7.13 | Docker Hub](https://hub.docker.com/layers/python/library/python/3.7.13/images/sha256-1c74715d93336cf6c85d61275585497803cf3f1b70aae47d1985e2ccfde8696c?context=explore)
+
+```dockerfile
+FROM python:3.7.13
+```
+
+[镜像加速器 - Docker — 从入门到实践 (gitbook.io)](https://yeasy.gitbook.io/docker_practice/install/mirror)

@@ -384,5 +384,263 @@ https://blog.csdn.net/jia12216/article/details/88352711
   }
   ```
 
+
+---
+
+*2022.03.26*
+
+### 环境与发布
+
+> [Index · Environments · Ci · 帮助 · GitLab (jihulab.com)](https://jihulab.com/help/ci/environments/index.md)
+
+#### 查看当前的环境
+
+- 打开项目仓库，**部署 > 环境**
+
+![image-20220326155825037](GitLab.assets/image-20220326155825037.png)
+
+#### GitLab的环境级别
+
+- `production`
+- `staging`
+- `testing`
+- `development`
+- `other`
+
+#### 创建一个静态环境：master
+
+- 指的是长期存在且名称保持不变的环境
+
+- **部署 > 环境 > 新建环境**
+
+- Name：`master`
+
+- URL：`http://test.example.com`
+
+- 如果还要再为这个环境产生部署，在`.gitlab-ci.yml`中指明环境即可
+
+  ```yaml
+  deploy_master:
+    stage: deploy
+    script:
+      - echo "部署master环境"
+    environment:
+      name: master
+      url: http://test.example.com # 可选
+      deployment_tier: production # 可显式声明层级
+  ```
+
+### 配置GitLab Agent为CI/CD服务
+
+- 在仓库中添加文件`.gitlab/agents/<agent-name>/config.yaml`。内容可以为空
+
+- **基础设施 > Kubernetes集群 > Install a new agent**
+
+- 摘抄关键信息
+
+    ```sh
+    docker run --rm \
+        registry.gitlab.com/gitlab-org/cluster-integration/gitlab-agent/cli:stable generate \
+        --agent-token=KRfXYPQj9rtGNyNPc5dre5pKRsvBCpofttkVhF-GxoDam2QaiA \
+        --kas-address=wss://kas.jihulab.com \
+        --agent-version stable \
+        --namespace gitlab-kubernetes-agent | kubectl apply -f -
+    ```
+
+- 在Kubernetes集群中执行
+
+> [Using a GitLab CI/CD workflow for Kubernetes | GitLab](https://docs.gitlab.com/ee/user/clusters/agent/ci_cd_tunnel.html)
+
+- 首先确保已经在集群上安装GitLab Agent，并且拥有一个注册该Agent的代码仓库
+
+- 更新`gitlab-ci.yml`脚本以使用gitlab agent来执行kubectl命令
+
+  ```yaml
+   deploy:
+     image:
+       name: bitnami/kubectl:latest
+       entrypoint: [""]
+     script:
+     - kubectl config get-contexts # 这一步可以获取到可用的agent
+     - kubectl config use-context path/to/agent/repository:agent-name
+     - kubectl get pods -n <your_namespace> # 如果不指定命名空间很可能会失败
+  ```
+
+  - > [kubernetes：pods is forbidden: User “system:serviceaccount:dev:default” cannot create resource “pods”_大鹏blog的博客-CSDN博客](https://blog.csdn.net/textdemo123/article/details/101352707)
+
+  - 如果出现权限不足，执行`kubectl create clusterrolebinding gitlab-cluster-admin --clusterrole=cluster-admin --group=system:serviceaccounts --namespace=<your_namespace>`
+
+> [Overriding KUBE_NAMESPACE (#34048) · Issues · GitLab.org / GitLab · GitLab](https://gitlab.com/gitlab-org/gitlab/-/issues/34048)
+>
+> [Kubernetes deployment not found !!! (#324125) · Issues · GitLab.org / GitLab · GitLab](https://gitlab.com/gitlab-org/gitlab/-/issues/324125)
+>
+> 目前已经确认15.0将弃用证书连接集群的功能，KUBE_NAMESPACE也将不复存在
+
+---
+
+*2022.03.27*
+
+### 打上版本号——Release
+
+> [Index · Releases · Project · User · 帮助 · GitLab (jihulab.com)](https://jihulab.com/help/user/project/releases/index)
+
+- 建议在CI/CD中打版本，同时建议在CI/CD的最后一个stage才去执行创建发布的工作
+- **部署 > 发布**或直接在仓库概要中找到**X releases**就可以去查看所有的发布
+
+#### 基本的Release模板
+
+- gitlab提供了release关键字来进行自动化版本发布
+
+  ```yaml
+  release_job:
+    stage: release
+    tags:
+      - shuishan-aliyun-runner
+    image: registry.gitlab.com/gitlab-org/release-cli:latest
+    rules:
+      - if: $CI_COMMIT_TAG                  # Run this job when a tag is created manually
+    script:
+      - echo "running release_job"
+    release:
+      name: 'Release $CI_COMMIT_TAG'
+      description: 'Created using the release-cli $EXTRA_DESCRIPTION'  # $EXTRA_DESCRIPTION must be defined
+      tag_name: '$CI_COMMIT_TAG'                                       # elsewhere in the pipeline.
+      ref: '$CI_COMMIT_TAG'
+      milestones:
+        - '演示版本Tag的里程碑示例'
+  ```
+
+- 这样每当推送tag，或者直接在GitLab UI上**仓库 > 标签 > 新建标签**打标签的时候，就会使`CI_COMMIT_TAG`拥有版本号的值，然后触发流水线。
+
+  ![image-20220327200533120](GitLab.assets/image-20220327200533120.png)
+
+  ![image-20220327200521815](GitLab.assets/image-20220327200521815.png)
+
+- 这就是一个发布基本的模样
+
+  ![image-20220327200504022](GitLab.assets/image-20220327200504022.png)
+
+---
+
+*2022.03.29*
+
+### Alerts 警报
+
+- GitLab可以从任意来源接受警报，通过webhook接收器的方式。
+- 可以在项目的**监控 > 警报**中查看当前配置的所有警报。
+
+那么如何配置呢？
+
+#### HTTP端点
+
+- 至少拥有Maintainer权限，打开**设置 > 监控 > 警报 > 添加新的集成**
+
+- 类型选择**HTTP端点**
+
+- 启用集成
+
+- GitLab默认支持的JSON消息会按照像这样的格式，其中的很多属性都会和GitLab警报列表所显示的一些信息有关：
+
+  ```json
+  {
+    "title": "Incident title",
+    "description": "Short description of the incident",
+    "start_time": "2019-09-12T06:00:55Z",
+    "service": "service affected",
+    "monitoring_tool": "value",
+    "hosts": "value",
+    "severity": "high",
+    "fingerprint": "d19381d4e8ebca87b55cda6e8eee7385",
+    "foo": {
+      "bar": {
+        "baz": 42
+      }
+    }
+  }
+  ```
+
+- 如果想按照警报源JSON的格式，可以将警报源的JSON映射到GitLab字段。
+
+- 在保存集成之后可以看到为这个警报创建的webhook和凭证token
+
+  ![image-20220329220637640](GitLab.assets/image-20220329220637640.png)
+
+- 而监控源这边就可以以这种方式发送请求
+
+  ```sh
+  curl --request POST \
+    --data '{"title": "Incident title"}' \
+    --header "Authorization: Bearer <authorization_key>" \
+    --header "Content-Type: application/json" \
+    <url>
+  ```
+
+#### Prometheus警报
+
+- 也可以选择Prometheus类型
+
+- 然后配置好Prometheus的URL
+
+- 拿到认证凭证的`<url>`和`<token>`，然后去**Prometheus AlertManager**实例上增加警报配置。
+
+  ```yaml
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    #配置文件名称
+    name: alertmanager-config
+    namespace: monitoring
+    labels:
+      kubernetes.io/cluster-service: "true"
+      addonmanager.kubernetes.io/mode: EnsureExists
+  data:
+    alertmanager.yml: |
+      global:
+        resolve_timeout: 1m
+  
+      receivers:
+      - name: gitlab
+        webhook_configs:
+          - http_config:
+              authorization:
+                type: Bearer
+                credentials: <token>
+            send_resolved: true
+            url: https://<url>/notify.json
+  
+  
+      route:
+        group_interval: 1m
+        group_wait: 10s
+        receiver: gitlab
+        repeat_interval: 1m
+  ```
+
+> [Configuration | Prometheus](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config)
+>
+> [Prometheus K8S中部署Alertmanager - 冥想心灵 - 博客园 (cnblogs.com)](https://www.cnblogs.com/linux985/p/14142379.html)
+>
+> [Setting Up Alert Manager On Kubernetes - Beginners Guide (devopscube.com)](https://devopscube.com/alert-manager-kubernetes-guide/)
+
+- 首先按照上面的链接安装好AlertManager
+
+- 然后为prometheus配置告警target，在prometheus的config中配置：
+
+  ```yaml
+  alerting:
+        # 告警配置文件
+        alertmanagers:
+        # 修改：使用静态绑定
+        - static_configs:
+          # 修改：targets、指定地址与端口
+          - targets: ["alertmanager:9093"]
+      rule_files:
+        - "/opt/rules/*.rules"
+  ```
+
+- 在规则配置中可以设置几种常见的规则
+
+- 别忘记挂载规则文件
+
   
 
