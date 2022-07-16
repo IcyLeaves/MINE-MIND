@@ -47,7 +47,7 @@ var Default=new Vue({
 ```
 
 - vue.js和element.js分别去vue和element的官网寻找
-- fonts文件（以2.13.1为例）下载地址：https://unpkg.com/browse/element-ui@2.13.1/lib/theme-chalk/fonts
+- fonts文件（以2.13.1为例）下载地址：https://unpkg.com/browse/element-ui@2.13.1/lib/theme-chalk/fonts/
   - `.ttf`和`.woff`下载后放在单页面文件同级的`fonts`文件夹下
 
 ---

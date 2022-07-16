@@ -224,3 +224,128 @@ public class CourseServiceImplTest {
 }
 ```
 
+---
+
+*2022.06.29*
+
+### 如何编写Wrapper&强大的Mapper
+
+> 参考链接：[Mybatis plus强大的条件构造器QueryWrapper条件构造器基础方法解释](https://www.cnblogs.com/nongzihong/p/12661446.html)
+
+#### 单表、条件查询
+
+``` sql
+SELECT *
+FROM app_user
+WHERE company_id="aaa";
+```
+
+```java
+QueryWrapper<ClientUser> queryWrapper=new QueryWrapper<>();
+queryWrapper.lambda().eq(ClientUser::getCompanyId, "aaa");
+
+Page<BoxInfo> boxInfoPage=new Page<>(currentPage,pageSize);
+boxInfoPage = boxInfoMapper.selectPage(boxInfoPage,queryWrapper);
+```
+
+#### 单表、多行更新
+
+``` sql
+UPDATE box_info
+SET user_id="aaa"
+WHERE serial_num IN ["NO1","NO2","NO4"];
+```
+
+```java
+String strArray = {"NO1","NO2","NO4"};
+List<String> strList = Arrays.asList();
+
+UpdateWrapper<BoxInfo> updateWrapper=new UpdateWrapper<>();
+updateWrapper.lambda().
+        in(BoxInfo::getSerialNum,strList).
+        set(BoxInfo::getUserId,"aaa");
+
+int updated=boxInfoMapper.update(null,updateWrapper);
+```
+
+#### 多表、多行、条件查询、可选查询、分页查询
+
+```sql
+SELECT *
+FROM box_info as B
+LEFT JOIN app_user as U
+ON B.user_id=U.id
+WHERE B.is_deleted="0" and U.is_deleted="0" and B.company_id="aaa" (and B.user_id="bbb");
+```
+
+``` java
+@Mapper
+public interface BoxInfoMapper extends BaseMapper<BoxInfo> {
+    List<MyBoxRes> AllMyBox(String companyId,String userId);
+}
+```
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxx.admin.mapper.PrinterMapper">
+    <select id="AllMyBox" resultType="com.cloud.response.MyBoxRes">
+        select *
+        from box_info as B
+        left join app_user as U on B.user_id=U.id
+        <where>
+            B.is_deleted="0" and U.is_deleted="0" and B.company_id=#{companyId}
+            <if test="userId != '' and userId != null">
+                    and B.user_id=#{userId}
+            </if>
+        </where>
+    </select>
+</mapper>
+```
+
+```java
+List<MyBoxRes> boxList=boxInfoMapper.AllMyBox(companyId,userId);//先返回所有匹配数据
+boxList=PageUtil.startPage(boxList,currentPage,pageSize);//手动分页
+```
+
+#### 多表、多行、条件查询、分页查询、聚合函数+GROUPBY
+
+```sql
+SELECT U.id,U.company_id,U.truename,U.phone,
+COUNT(case when B.is_deleted=0 then B.serial_num end) as boxNum,
+IFNULL(SUM(case when P.is_deleted=0 then
+  (P.print_a4_black_num+
+  P.print_a3_black_num+
+  P.print_a4_color_num+
+  P.print_a3_color_num+
+  P.copy_a4_black_num+
+  P.copy_a3_black_num+
+  P.copy_a4_color_num+
+  P.copy_a3_color_num) else 0 end) ,0) as printNum
+FROM app_user as U
+LEFT JOIN box_info as B ON U.id=B.user_id
+LEFT JOIN printer_info as P ON B.serial_num=P.box_sn
+WHERE U.title='客户' and U.company_id="icyTest" and U.is_deleted=0
+GROUP BY U.id;
+```
+
+```xml
+<select id="AllMyClient" resultType="com.cloud.response.MyClientRes">
+    SELECT U.id,U.company_id,U.truename,U.phone,
+    COUNT(case when B.is_deleted=0 then B.serial_num end) as boxNum,
+    IFNULL(SUM(case when P.is_deleted=0 then
+    (P.print_a4_black_num+
+    P.print_a3_black_num+
+    P.print_a4_color_num+
+    P.print_a3_color_num+
+    P.copy_a4_black_num+
+    P.copy_a3_black_num+
+    P.copy_a4_color_num+
+    P.copy_a3_color_num) else 0 end) ,0) as printNum
+    FROM app_user as U
+    LEFT JOIN box_info as B ON U.id=B.user_id
+    LEFT JOIN printer_info as P ON B.serial_num=P.box_sn
+    WHERE U.title='客户' and U.company_id=#{companyId} and U.is_deleted=0
+    GROUP BY U.id;
+</select>
+```

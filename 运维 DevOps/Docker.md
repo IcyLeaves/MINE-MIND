@@ -76,6 +76,9 @@ services:
   - 查看相关信息，比较有用的是查看占用的内存
 - `docker system df`
   - 查看占用的磁盘空间
+- `find /var/lib/docker/containers/ -type f -name "*.log" -delete`
+  - 移除所有日志文件
+
 
 ---
 

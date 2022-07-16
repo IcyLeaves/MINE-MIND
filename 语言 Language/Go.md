@@ -42,8 +42,10 @@
 ### Go语言教程
 
 > [k8stech/go-learning: golang 实战课程示例代码 (github.com)](https://github.com/k8stech/go-learning)
-
-
+>
+> [Setting Up Go Locally | Codecademy](https://www.codecademy.com/article/setting-up-go-locally)
+>
+> [深入学习Golang—channel - 码农教程 (manongjc.com)](http://www.manongjc.com/detail/50-lybwsdrxastdqdj.html)
 
 ---
 
@@ -156,3 +158,118 @@ replace A => B v1.2.3 // indirect
 
 - 扫描依赖
 
+---
+
+*2022.07.10*
+
+### golang的代码片段
+
+#### 基础
+
+##### 库
+
+- 可以取别名
+
+```go
+import (
+	f "fmt"
+    t "time"
+)
+```
+
+##### 变量
+
+- 快速新建变量和初始化
+
+```go
+i:=0
+str:="hello"
+```
+
+- 声明
+
+```go
+var a int = 2
+```
+
+##### 函数
+
+- 顺序是函数名、参数、返回类型
+
+```go
+func countPoints(rings string) (int, float) {
+    
+}
+```
+
+##### 条件分支
+
+- 可以用分号分隔，先预执行一些代码，然后把判断表达式写在最后一段
+
+```go
+if temp:=2; temp < 3{
+    
+}
+```
+
+
+
+##### 循环
+
+- C风格
+
+```go
+for i:=0;i<5;i++ {
+    
+}
+```
+
+- Python风格
+  - range是先拷贝范围，然后再进行循环
+
+```go
+for i,c:=range "hello" {
+    //只想要元素的话可以用废弃占位符"_"
+}
+```
+
+##### 字符串
+
+- 字符串遍历
+  - 字节遍历：直接用`len(str)`获取长度，然后使用`str[i]`来获取字符
+    - string默认是字节存储，因此出现非UTF-8字符时会出现差错
+  - range遍历：直接使用`for i, v:= range str {}`
+    - 这样`i`仍按字节位置计算
+  - 转换后遍历：先转换成`[]rune(str)`，然后就可以用`str[i]`
+
+##### 数组
+
+- 初始化
+
+  ```go
+  //Golang中的数组是值类型，并非是基本数据类型
+  var array [10]int
+  var array2 = [3]int{1, 2, 3}
+  var array3 = [...]int{2, 3, 4}        //让编译器推断数组的长度
+  var array4 = [4]int{0: 1, 1: 3, 2: 4} //指定下标进行赋值
+  ```
+
+##### 类型转换
+
+- int->string： 
+  - `fmt.Sprintf("%d", 100/3)`
+  - `str := strconv.Itoa(int)`
+  - int64->：`str := strconv.FormatInt(int64,10)`
+- string->int：
+  - `i, err := strconv.Atoi(string)`
+  - ->int64：`i, err := strconv.ParseInt(string, 10, 64)`
+
+#### 简单
+
+##### math
+
+- 绝对值：math.Abs(x float64)
+
+#### 中等
+
+#### 困难
