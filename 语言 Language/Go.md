@@ -202,17 +202,36 @@ func countPoints(rings string) (int, float) {
 }
 ```
 
+- 函数也是一种类型。
+  - 如果要使用自身（递归），得先声明自己的类型。不可以用`:=`的方法
+
+```go
+var dfs func(*TreeNode)
+dfs = func(n *TreeNode) {
+	if n == nil {
+		return
+	}
+  //do something
+	dfs(n.Left)
+	dfs(n.Right)
+}
+dfs(root)
+```
+
+
+
 ##### 条件分支
 
-- 可以用分号分隔，先预执行一些代码，然后把判断表达式写在最后一段
+- 可以用分号分隔，先预执行一些代码，然后把判断表达式写在最后一段。
+- else需要写在if最后一行括号的同行
 
 ```go
 if temp:=2; temp < 3{
     
+} else if temp>5 {
+  
 }
 ```
-
-
 
 ##### 循环
 
@@ -242,6 +261,34 @@ for i,c:=range "hello" {
     - 这样`i`仍按字节位置计算
   - 转换后遍历：先转换成`[]rune(str)`，然后就可以用`str[i]`
 
+##### Map、Set
+
+- Golang没有set，直接用map实现
+
+```go
+// set
+myset := make(map[string]bool)
+set["Foo"] = true
+delete(set, "Foo")
+exists := set["Foo"]
+```
+
+###### 无内存空间的替代方案
+
+- 使用`struct{}`并不会使用任何内存空间
+
+```go
+type void struct{}
+var empty void
+
+set := make(map[string]void)
+set["Foo"] = empty
+delete(set, "Foo")
+_, exists := set["Foo"]
+```
+
+
+
 ##### 数组
 
 - 初始化
@@ -253,6 +300,30 @@ for i,c:=range "hello" {
   var array3 = [...]int{2, 3, 4}        //让编译器推断数组的长度
   var array4 = [4]int{0: 1, 1: 3, 2: 4} //指定下标进行赋值
   ```
+
+##### 切片
+
+- 初始化
+
+  ```go
+  //空
+  s := make([]string, 3)
+  //引用 区间[a,b)
+  tmp := []string{"a","b","c"}
+  scopy := tmp[1:2]
+  ```
+
+- 删除元素并且不改变原有数组。删除的原理是把待删除元素的右边append到左边的部分后面
+
+  - [go - How to delete an element from a Slice in Golang - Stack Overflow](https://stackoverflow.com/questions/37334119/how-to-delete-an-element-from-a-slice-in-golang)
+
+  - ```go
+    func RemoveIndex(s []int, index int) []int {
+        ret := make([]int, 0)
+        ret = append(ret, s[:index]...)
+        return append(ret, s[index+1:]...)
+    }
+    ```
 
 ##### 类型转换
 
@@ -268,7 +339,28 @@ for i,c:=range "hello" {
 
 ##### math
 
-- 绝对值：math.Abs(x float64)
+- 绝对值：`math.Abs(x float64)`
+
+- 最小值：`math.Min(x,y float64) float64`
+
+  - 但，要比较整数该怎么办呢。这里是个可以接受多个整数的写法
+
+    ```go
+    func MinOf(vars ...int) int {
+        min := vars[0]
+    
+        for _, i := range vars {
+            if min > i {
+                min = i
+            }
+        }
+    
+        return min
+    }
+    ```
+
+    
+
 
 #### 中等
 
