@@ -7,6 +7,15 @@
 - MacOS的Typora复制URL时并不会携带网站标题，可以通过在Chrome浏览器安装TabCopy插件来解决。
 
   - > [TabCopy – 快速复制 Chrome 所有标签页的标题和地址并多格式输出[Chrome 扩展]](http://www.apprcn.com/tabcopy.html)
+  
+- 设置触控板和鼠标的滚轮方向相反
+
+  - [ther0n/UnnaturalScrollWheels: Invert scroll direction for physical scroll wheels while maintaining "Natural" scrolling for trackpads on MacOS](https://github.com/ther0n/UnnaturalScrollWheels)
+  
+- 截图工具的搭配：Xnip+Snipaste
+
+  - 满足了「贴图」、「长截图」、「标注」、「步骤说明」等重要需求
+  
 
 ---
 
@@ -115,3 +124,4 @@ p10k configure
 
 - 如果安装超时：[homebrew | 镜像站使用帮助 | 清华大学开源软件镜像站 | Tsinghua Open Source Mirror](https://mirrors.tuna.tsinghua.edu.cn/help/homebrew/)
   - 「替换现有仓库上游」也是要做的
+
